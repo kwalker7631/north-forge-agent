@@ -99,6 +99,46 @@ def test_discover_cron_jobs_skips_malformed_entries_without_raising(tmp_path):
     assert [j["name"] for j in jobs] == ["good-job"]
 
 
+def test_discover_cron_jobs_includes_primary_skill_in_skills_list(tmp_path):
+    """Regression (2026-09-12 spot-check): tools.cronjob_job_args._canonical_skills()
+    only falls back to the singular `skill=` kwarg when `skills=` is None — an
+    explicit `skills=[]` is treated as "no skills at all" and silently drops the
+    primary skill, leaving the persisted job's "skill" field null. discover_cron_jobs
+    must fold the primary skill into "skills" itself so callers never hit that
+    fallback-only quirk by passing an empty list."""
+    _write_skill(tmp_path, "kyocera-research", textwrap.dedent("""\
+        name: kyocera-research
+        description: d
+        cron:
+          - name: nightly-kyocera-research
+            schedule: "0 6 * * *"
+            prompt: "Run the kyocera-research pass"
+        """))
+
+    jobs = nf_sync_cron.discover_cron_jobs(tmp_path)
+
+    assert jobs[0]["skill"] == "kyocera-research"
+    assert jobs[0]["skills"] == ["kyocera-research"]
+
+
+def test_sync_passes_nonempty_skills_list_so_skill_field_never_resolves_null(tmp_path):
+    _write_skill(tmp_path, "kyocera-research", textwrap.dedent("""\
+        name: kyocera-research
+        description: d
+        cron:
+          - name: nightly-kyocera-research
+            schedule: "0 6 * * *"
+            prompt: "Run the kyocera-research pass"
+        """))
+    fake = FakeCronjob()
+
+    nf_sync_cron.sync(cronjob_fn=fake, skills_dir=tmp_path)
+
+    call = fake.create_calls[0]
+    assert call["skill"] == "kyocera-research"
+    assert call["skills"] == ["kyocera-research"]  # NOT [] — see regression note above
+
+
 def test_sync_creates_only_missing_jobs_and_never_pins_model(tmp_path):
     _write_skill(tmp_path, "kyocera-research", textwrap.dedent("""\
         name: kyocera-research

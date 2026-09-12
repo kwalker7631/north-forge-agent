@@ -117,12 +117,22 @@ def discover_cron_jobs(skills_dir: Path) -> List[Dict[str, Any]]:
                 print(f"[nf-sync-cron] WARNING: {skill_dir_name}: cron entry missing "
                       f"required name/schedule/prompt, skipping: {entry!r}")
                 continue
+            primary_skill = entry.get("skill", skill_name)
+            extra_skills = entry.get("skills") or []
+            # tools.cronjob_tools._canonical_skills() only falls back to the singular
+            # `skill=` kwarg when `skills=` is None — an explicit `skills=[]` (which is
+            # what `entry.get("skills") or []` used to always produce here) is treated
+            # as "no skills at all" and silently drops the primary skill, leaving the
+            # persisted job's "skill" field null. Build the combined list ourselves so
+            # the primary skill is never lost regardless of that fallback-only quirk.
+            combined_skills = ([primary_skill] if primary_skill else []) + [
+                s for s in extra_skills if s != primary_skill]
             jobs.append({
                 "name": name,
                 "schedule": schedule,
                 "prompt": prompt,
-                "skill": entry.get("skill", skill_name),
-                "skills": entry.get("skills") or [],
+                "skill": primary_skill,
+                "skills": combined_skills or None,
                 "_source_skill": skill_dir_name,
             })
     return jobs

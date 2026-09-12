@@ -860,6 +860,76 @@ in [`README.md`](../README.md). Severity: **CRITICAL** · **HIGH** · **MEDIUM**
   (`nf-branding-guard.yml`). Decision record: DECISION-2026-09-11-001.
 - **Status:** RESOLVED.
 
+### ERR-2026-09-12-001 — MEDIUM — `nf_sync_cron.py`-registered jobs never carried a resolvable `skill`
+
+- **Opened:** 2026-09-12 · **Base:** hermes@a1f6e499d1 (515 behind upstream/main)
+- **Run:** RUN-2026-09-12-003
+- **Source:** Independent fresh-session verification of Perplexity's handoff
+  claims for `scripts/nf_sync_cron.py` (`CHG-2026-09-12-XXX` per the handoff,
+  landed on `origin/main` at `c9d48a392d`). Part 2 recommendation #1 asked to
+  spot-check that a real skill's persisted cron record resolves `"skill"` to
+  the skill's name rather than `null` — it did not.
+- **What:** `discover_cron_jobs()` built each job dict with
+  `"skills": entry.get("skills") or []` — an **empty list**, not `None`,
+  whenever a skill's `cron:` frontmatter entry declares no additional
+  `skills:` block (the common case — neither `kyocera-research` nor
+  `daily-brief` declares one). `sync()` forwards that as
+  `cronjob_fn(..., skill=<name>, skills=[])`.
+  `tools.cronjob_job_args._canonical_skills(skill, skills)` only falls back to
+  the singular `skill=` kwarg when `skills is None`; an explicit `skills=[]`
+  is treated as "no skills at all" and the singular `skill` is silently
+  dropped. Reproduced directly: `_canonical_skills("kyocera-research", [])`
+  → `[]`; `_canonical_skills("kyocera-research", None)` → `["kyocera-research"]`.
+  Confirmed end-to-end against the real `tools.cronjob_tools.cronjob()` (no
+  mocking) with the actual `north-forge-hermes-edition` `kyocera-research`
+  `SKILL.md`, in a fresh sandboxed `HERMES_HOME`: the created job persisted
+  with `"skill": null, "skills": []` before the fix. Impact is not cosmetic —
+  the job has **no skill attached at all**, so its prompt fires without the
+  skill's own instructions loaded into context.
+- **Fix:** `discover_cron_jobs()` now folds the resolved primary skill into
+  the `"skills"` list itself (`combined_skills = [primary_skill] + extras`,
+  passed as `None` only when genuinely empty), so the persisted record's
+  `"skill"` field never depends on `_canonical_skills()`'s None-vs-`[]`
+  fallback distinction. Re-ran the same fresh-`HERMES_HOME` end-to-end check
+  after the fix: persisted record now reads
+  `"skill": "kyocera-research", "skills": ["kyocera-research"]`.
+- **Status:** RESOLVED. CHG-2026-09-12-004 (`RUN-2026-09-12-003`) — 2 new
+  regression tests added to `tests/scripts/test_nf_sync_cron.py`
+  (17 total, all passing). Not yet pushed — held per this repo's
+  review-before-push convention.
+
+### ERR-2026-09-12-002 — LOW — `build-handoff-bundle.ps1` wrote the zip inside a repo checkout instead of the drive root
+
+- **Opened:** 2026-09-12 · **Base:** hermes@a1f6e499d1 (515 behind upstream/main)
+- **Run:** RUN-2026-09-12-003
+- **Source:** First real run of `scripts/build-handoff-bundle.ps1` (added
+  uncommitted last session as `CHG-2026-09-12-003`, explicitly "not verified
+  by running it" due to that session's command-execution block) — this
+  session used it for real to build its own end-of-session bundle.
+- **What:** with no `-DriveRoot` passed, the script defaulted to
+  `Split-Path -Qualifier $SessionReportPath`, which returns a bare `"D:"`
+  (no trailing separator). Windows treats a bare drive letter as
+  **drive-relative** (relative to that drive's current working directory in
+  the process), not drive-rooted; `Resolve-Path -LiteralPath "D:"` silently
+  resolved to whatever directory the shell happened to be `cd`'d into on
+  that drive — in the reproducing run, `D:\north-forge-agent` — instead of
+  `D:\`. The zip and its `.sha256` sidecar landed at
+  `D:\north-forge-agent\HANDOFF_2026-09-12_1939.zip`, defeating the whole
+  point of the drive-root convention (a bundle a session's own report can
+  point to reliably, and that another repo's session can find). Reproduced
+  by running the script for real from `D:\north-forge-agent` with no
+  `-DriveRoot` argument.
+- **Fix:** append the path separator (`(Split-Path -Qualifier ...) + '\'`)
+  so `Resolve-Path` is forced into the drive-rooted interpretation.
+  Re-ran the same call from an unrelated working directory (`C:\`, so any
+  stale drive-relative state on `D:` couldn't mask the bug returning) —
+  confirmed the zip now lands at `D:\HANDOFF_2026-09-12_1939.zip`.
+- **Status:** RESOLVED. CHG-2026-09-12-005 (`RUN-2026-09-12-003`). No test
+  added — the script has no existing test harness and this is a one-line
+  path fix verified by the actual run above; flagging that
+  `scripts/build-handoff-bundle.ps1` has zero test coverage as a follow-up,
+  not fixed this run (out of scope for a verification task).
+
 ---
 
 ## Register (quick scan)
@@ -895,3 +965,5 @@ in [`README.md`](../README.md). Severity: **CRITICAL** · **HIGH** · **MEDIUM**
 | ERR-2026-09-09-003 | 2026-09-09 | MEDIUM | `hermes` sessions CLI | `query_session_listing` fetched a fixed `limit*4` window then filtered unnamed/current rows in Python — enough newer unnamed sessions hid an older *named* displayable session that was never fetched (same shape as `ERR-2026-09-08-008`) | RESOLVED | CHG-2026-09-09-002 — `limit<=0` ⇒ `[]` before any query; adaptive widening `limit*(4,8,16)` always from row 0, stop when `limit` displayable rows survive or the DB returns short; filter factored to `_displayable()`; `+5` tests |
 | ERR-2026-09-10-001 | 2026-09-10 | HIGH | Access-tier logic | A `Merge branch 'main' into main` dropped `def _desktop_ssh_backend` from `hermes_cli/main.py` but kept its call in `_apply_profile_override` (`main.py:642`); the module-level call at `main.py:679` makes `import hermes_cli.main` raise `NameError` on an unprovisioned or Full-tier drive. On `origin/main` too. Introduced by a merge after `677e8ed8a4`; not caused by `CHG-2026-09-10-001` (reproduced on the reverted tree) | RESOLVED | CHG-2026-09-10-003 (`RUN-2026-09-10-003`) — `def _desktop_ssh_backend` restored **verbatim** from `677e8ed8a4`, before `_apply_profile_override`. `import hermes_cli.main` OK; covering test survived the merge and passes; `test_nf_admin.py` 17p; `test_nf_tier_enforcement.py` 30p (the 1 prior failure gone). Pushed to `origin/main` |
 | ERR-2026-09-11-001 | 2026-09-11 | CRITICAL | Fork identity / repo config | GitHub fork-sync ("Sync fork" discard / `merge-upstream`) force-reset `origin/main` to an upstream `NousResearch/hermes-agent` commit, wiping all 186 fork-only commits (branding, `SOUL.md`, `BRANDING.md`, ledger, CLI skin, installer) — 2nd occurrence; `main` had zero branch protection | RESOLVED | CHG-2026-09-11-003 (branch protection incl. `allow_fork_syncing: false`) / CHG-2026-09-11-004 (`nf-branding-guard.yml` CI check); recovery = force-push of local `main`; DECISION-2026-09-11-001 |
+| ERR-2026-09-12-001 | 2026-09-12 | MEDIUM | Cron / skills | `scripts/nf_sync_cron.py` passed `skills=[]` (not `None`) whenever a skill declared no extra `skills:`, and `tools.cronjob_job_args._canonical_skills()` only falls back to the singular `skill=` kwarg when `skills is None` — the primary skill was silently dropped, so every job it registered persisted with `"skill": null` and no skill loaded at all | RESOLVED | CHG-2026-09-12-004 (`RUN-2026-09-12-003`) — `discover_cron_jobs()` folds the primary skill into `"skills"` itself; verified end-to-end against the real `cronjob()` with `kyocera-research`'s actual `SKILL.md`; +2 regression tests (17 total) |
+| ERR-2026-09-12-002 | 2026-09-12 | LOW | Handoff tooling | `scripts/build-handoff-bundle.ps1` defaulted `-DriveRoot` to a bare `"D:"` (`Split-Path -Qualifier`), which `Resolve-Path` treats as drive-**relative**, not drive-rooted — the bundle silently landed inside whatever repo the shell was `cd`'d into instead of the drive root | RESOLVED | CHG-2026-09-12-005 (`RUN-2026-09-12-003`) — appended the path separator to force the rooted interpretation; verified by a real run from an unrelated `cwd` |

@@ -57,6 +57,8 @@ _None._ (`DECISION-2026-09-07-002` closed `RUN-2026-09-08-004`; see Resolved dec
 
 | ID | Sev | Summary | Fixed by |
 | --- | --- | --- | --- |
+| [ERR-2026-09-12-001](./errors/ERROR-LOG.md#err-2026-09-12-001--medium--nf_sync_cronpy-registered-jobs-never-carried-a-resolvable-skill) | MEDIUM | `nf_sync_cron.py` passed `skills=[]` instead of `None`, so its own `skill=` kwarg was silently dropped by `_canonical_skills()` — every job it registered persisted with `"skill": null` | CHG-2026-09-12-004 |
+| [ERR-2026-09-12-002](./errors/ERROR-LOG.md#err-2026-09-12-002--low--build-handoff-bundleps1-wrote-the-zip-inside-a-repo-checkout-instead-of-the-drive-root) | LOW | `build-handoff-bundle.ps1`'s default `-DriveRoot` (`Split-Path -Qualifier`) is drive-relative, not drive-rooted — first real run landed the bundle inside a repo checkout | CHG-2026-09-12-005 |
 | ERR-2026-09-06-002 | MEDIUM | Fault half (fork 2 behind upstream) fixed; choice half → `DECISION-2026-09-06-001` | CHG-2026-09-06-014 / migrated |
 | ERR-2026-09-06-003 | MEDIUM | `.gitignore` missed `.env.production` / `.env.<name>` | CHG-2026-09-06-007 |
 | ERR-2026-09-06-004 | LOW | Stray `%SystemDrive%` Windows cache tree in repo root (recurred; guard held) | CHG-2026-09-06-009 / -012 |

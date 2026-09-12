@@ -276,6 +276,15 @@ Subcommands:
 | `migrate-legacy` | Remove legacy `hermes.service` units left over from pre-rename installs. Profile units (`hermes-gateway-<profile>.service`) and unrelated services are never touched. Flags: `--dry-run`, `-y`/`--yes`. |
 | `enroll` | Experimental: enroll this gateway with a relay connector and save relay credentials for connector-backed platforms. See [Hermes Relay](/user-guide/messaging/relay). |
 
+`install` (and the automatic repair path `start`/any caller triggers when an
+installed service definition is stale) refuses to write a systemd unit or
+launchd plist whose `HERMES_HOME` resolves to a temporary directory (a system
+temp root, `/tmp`, `/var/tmp`, etc.), printing why and stopping instead. This
+guards against a test/E2E shell that exported a scratch `HERMES_HOME`
+accidentally installing a *permanent* OS-level service pointed at that
+throwaway directory — unset `HERMES_HOME` (or run from a clean shell) and
+retry.
+
 Options:
 
 | Option | Description |

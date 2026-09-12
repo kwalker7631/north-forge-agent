@@ -137,6 +137,48 @@ checkout.
   gateway install` by hand.
 - Generic North Forge support voice and public example overlays
 
+## Gateway service requirements
+
+The automatic gateway install described above runs the same install path as
+typing `hermes gateway install` yourself. What it needs to actually succeed —
+rather than back off and print a manual fallback — depends on the platform:
+
+**Windows**
+
+- No administrator rights needed for the normal path: it registers a
+  Scheduled Task that starts at your next login, using the `/RL LIMITED` run
+  level, which a standard (non-admin) account can create.
+- If the account is locked down enough that Windows still denies the
+  Scheduled Task, install falls back to a Startup-folder shortcut instead of
+  failing outright.
+- You can also decline auto-start-on-login when asked and run
+  `hermes gateway start` yourself later.
+
+**Linux (systemd)**
+
+- Needs a real, running systemd instance with `systemctl` on `PATH` — not a
+  bare container or CI image where systemd isn't the init process, and not a
+  WSL distro that has systemd disabled. Install detects this and prints
+  guidance instead of pretending it worked.
+- Needs a reachable user D-Bus session. A normal desktop login already has
+  one; a headless box or a fresh SSH session usually doesn't. Install tries
+  `loginctl enable-linger <you>` automatically — that succeeds without sudo
+  when the system's polkit policy allows it, otherwise you'll see a
+  `sudo loginctl enable-linger <you>` command to run once by hand.
+- Linger has to stay enabled, or the service can be killed the moment your
+  session ends — it's what lets a user-scope service survive logout.
+- If none of that is available, install reports the specific gap and backs
+  off cleanly rather than blocking your launch; `hermes gateway run` keeps
+  the gateway alive in the foreground as a manual, no-install fallback.
+
+**macOS** uses `launchd` and normally needs no extra setup — noted here only
+for completeness, since it's the third platform the same install path covers.
+
+On any platform, if the automatic step can't finish, North Forge still
+starts normally — a scheduled job is saved but won't fire until the
+platform-specific requirement above is resolved (or you run
+`hermes gateway install` by hand after resolving it).
+
 ## What is not included
 
 - Private manufacturer manuals, fault-code procedures, or customer data
@@ -191,6 +233,7 @@ PowerShell to see administrator commands.”**
 | The assistant opens but cannot answer | Run `hermes model` and confirm the selected provider and sign-in details. |
 | Automatic repair fails | Open the neighboring `north-forge-agent-launcher.log`; it records the failed readiness check. |
 | A conversation or setting appears missing after a folder rename | Restart with `north-forge.cmd` and choose **R** to reuse the detected data folder. Do not delete either folder. |
+| A scheduled job is saved but never fires ("gateway is not running yet") | See [Gateway service requirements](#gateway-service-requirements) above — usually a Linux D-Bus/linger gap or a blocked Windows Scheduled Task. Resolve it, then run `hermes gateway install`. |
 
 The portable data folder is normally named `north-forge-agent-data`. Runtime
 logs are under `north-forge-agent-data\logs\`; the early launcher log is beside

@@ -1,0 +1,11 @@
+# Copy this file into a NEW PRIVATE repo as distribution.yaml
+# Never commit manufacturer-proprietary skills into north-forge-agent.
+name: oem-example
+version: 0.1.0
+description: >-
+  Field-support edition for a named manufacturer. Replace oem-example
+  with sharp, ricoh, xerox, or the customer slug.
+author: North Forge
+license: UNLICENSED
+hermes_requires: ">=0.12.0"
+env_requires: []

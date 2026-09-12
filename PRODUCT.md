@@ -1,0 +1,46 @@
+# North Forge is a technical support assistant
+
+This is not Hermes Agent with a new name and a banner.
+
+**Hermes Agent** (Nous Research, MIT) is the *engine*: memory, tools, models, terminal, gateway.  
+**North Forge** is the *product*: a portable technical-support assistant that an administrator can load with real procedures, knowledge-base skills, and industry content — then hand to a tech who never types `git`.
+
+Anyone can clone this public repo and get a working agent.  
+An administrator can add a **private edition** (Kyocera today; Sharp, Ricoh, Xerox, or any other vertical tomorrow) and ship a stick that actually knows that company's support work.
+
+```
+Public engine          = this repository (free to run)
+Public overlays        = editions/penny-pincher, pine-barron-farms, field-service
+Private vertical       = a separate repo cloned into private-editions/<name>
+Admin deploy console   = lives with the private vertical (Kyocera: Advanced/deploy-console)
+Teammate experience    = plug in USB → double-click Start North Forge → type English
+```
+
+## What a tech actually gets
+
+Not a chatbot demo. A working assistant that can:
+
+- Take a hotline / ticket in a fixed order
+- Draft a knowledge-base article to a locked template
+- Build an escalation packet with the evidence that is present
+- Log a fault so the next person is not starting from zero
+- Stay inside technician judgment — it does not replace the tech
+
+Those skills are not in the public chassis. They live in the **edition**. The Kyocera edition is the reference implementation. Copy that shape for another manufacturer.
+
+## Two doors
+
+| Door | Who | What they get |
+|---|---|---|
+| Public GitHub | Anyone | Working North Forge agent, portable on a USB, generic chassis voice |
+| Admin edition | Licensed / private | Manufacturer skills, KB templates, deploy console, locked teammate sticks |
+
+Monetization, when it comes, sits on the **second door**: specialized skills and admin deployment, not on the engine. The engine stays MIT. Vertical content stays yours (or your customer's).
+
+## Not a reskin — the test
+
+If you strip the banner, the CLI name, and `SOUL.md`, and the product still does Kyocera (or Sharp, or Ricoh) intake, KB, and escalation the same way a senior TSC would — it is North Forge.  
+If all that remains is a general agent, you are looking at the engine only.
+
+Read [editions/OEM.md](editions/OEM.md) to cut a new manufacturer edition.  
+The Kyocera skill list and admin path live in the private edition repo, not here.

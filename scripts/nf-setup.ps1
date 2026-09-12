@@ -347,6 +347,24 @@ catch {
     Write-Warning "Default-skin step skipped: $($_.Exception.Message)"
 }
 
+# --- cron sync (part of provisioning) -----------------------------------------
+# Register any cron job a trusted skill declares in its own SKILL.md frontmatter
+# right now, at provision time - a freshly-provisioned Basic-tier drive gets its
+# scheduled research/brief jobs immediately instead of waiting on someone to
+# open an interactive session and type `/cron add` by hand (CHG-2026-09-12-001).
+# Add-if-missing only, never pins a model/provider, warning-only on failure -
+# same contract as the north-forge.cmd launch-time call to this script.
+try {
+    $cronSyncScript = Join-Path $RepoRoot 'scripts\nf_sync_cron.py'
+    if ((Test-Path -LiteralPath $pyExe) -and (Test-Path -LiteralPath $cronSyncScript)) {
+        $env:HERMES_HOME = $DataDir
+        & $pyExe $cronSyncScript
+    }
+}
+catch {
+    Write-Warning "Cron sync step skipped: $($_.Exception.Message)"
+}
+
 Write-Host ""
 Write-Host "Provisioned." -ForegroundColor Green
 Invoke-NfTier @('show')

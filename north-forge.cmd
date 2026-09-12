@@ -114,6 +114,12 @@ if exist "%REPO%\skins\north-forge.yaml" copy /Y "%REPO%\skins\north-forge.yaml"
 REM (Re)write "<drive>:\Start North Forge.lnk" against the path the checkout is at
 REM right now, so it stays correct even if Windows re-letters the drive.
 if exist "%REPO%\scripts\make-drive-root-shortcut.ps1" powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\scripts\make-drive-root-shortcut.ps1" -RepoRoot "%REPO%" -Quiet >nul 2>&1
+REM Register any cron job a trusted skill declares in its own SKILL.md frontmatter
+REM (kyocera-research, daily-brief, etc.) - closes the gap where scheduled research
+REM only got set up if someone typed `/cron add` by hand, which a Basic-tier
+REM teammate drive never does. Add-if-missing only, never pins a model, and a
+REM failure here is a warning, never a launch-blocker (CHG-2026-09-12-001).
+if exist "%REPO%\scripts\nf_sync_cron.py" "%VENV%\Scripts\python.exe" "%REPO%\scripts\nf_sync_cron.py" 2>nul
 
 REM --- North Forge tier check (CHG-2026-09-07-022) --------------------------------
 REM If this drive carries a provisioning record and it has been tampered with,

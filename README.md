@@ -19,15 +19,28 @@
 
 ---
 
-North Forge is a **working assistant for technical support teams**. It can help
-with devices, PCs, networks, and the document stack installed in its edition.
-It is designed to give short, ordered help and to identify missing knowledge
-instead of confidently inventing an answer.
+North Forge is an **agentic conversational assistant for technical support
+teams**, running on [Hermes Agent](https://github.com/NousResearch/hermes-agent)
+(Nous Research's tool-calling LLM engine) with a Windows-first portable
+launcher, a drive-local storage layout, and a Full/Basic tier gate on top. Under
+the hood it is the same class of system as any Hermes deployment — file,
+terminal, browser, memory, scheduling, and gateway tools driven by whatever
+model you point it at, cloud or local — packaged so a non-technical teammate
+can plug in a drive and start talking instead of configuring an agent runtime.
 
-This public repository is the **chassis**: the agent engine, Windows launcher,
-portable storage layout, and generic support overlays. Manufacturer procedures
-are not published here. An administrator adds those through a private edition
-(Kyocera today; other manufacturers can use the [OEM template](editions/OEM.md)).
+That packaging is deliberately split in two. **This repository is the
+chassis** — the engine, the launcher, the tier/passcode gate, the declarative
+cron-sync that keeps a skill's own schedule registered without anyone typing a
+command, and a generic support voice with no manufacturer content in it.
+Manufacturer procedures — fault-code trees, firmware history, the actual
+field knowledge a tech needs — live in a separate **private edition**
+(Kyocera today; other manufacturers can start from the [OEM template](editions/OEM.md))
+that installs into this chassis as a Hermes profile. Neither half is much use
+alone: the chassis without an edition is a competent generalist with nothing
+manufacturer-specific to say, and an edition's knowledge only reaches a
+teammate through this chassis's runtime, tiering, and launcher. The private
+edition is closer to a key than a decoration — it is what turns a general
+assistant into one that actually knows this manufacturer's equipment.
 
 | Who | What they do |
 |---|---|
@@ -113,6 +126,10 @@ checkout.
 - Drive-local configuration, conversations, memories, and logs
 - File, terminal, browser, memory, scheduling, gateway, TUI, and desktop
   capabilities inherited from Hermes
+- Declarative cron sync (`scripts/nf_sync_cron.py`): any installed skill that
+  declares a `cron:` block in its own `SKILL.md` gets that job registered
+  automatically on every launch and right after provisioning — no manual
+  `/cron add`, no model/provider pin, so it runs the same on Basic and Full tier
 - Generic North Forge support voice and public example overlays
 
 ## What is not included

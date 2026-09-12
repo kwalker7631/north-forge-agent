@@ -1,63 +1,65 @@
 # What North Forge can actually do
 
-Three years of TSC work went into this. The hard part of the docs is not listing buttons. It is saying, in plain language, that the assistant is supposed to **know when it does not know**.
+The front door is [START_HERE.md](START_HERE.md). This page is the inventory.
 
-This page is the public picture. Manufacturer procedures (Kyocera, and later Sharp / Ricoh / Xerox) live in a private edition.
+Three years of TSC work went into the pack. The hard part of the docs is not
+listing buttons. It is saying the assistant is supposed to **know when it
+does not know**.
+
+Manufacturer procedures (Kyocera now; Sharp / Ricoh / Xerox later) live in a
+private edition, not in this public repo.
 
 ## The job
 
-North Forge is an on-demand expert for people who already work on machines, networks, and document systems. It is meant to sit next to a tech — not replace them.
-
-It is built to cover the messy middle of a support call:
+Sit next to a tech. Cover the messy middle of a call:
 
 - Electro-mechanical devices (print / scan / finish / paper path / supplies)
-- The PC and network the device is attached to (Windows, macOS, Linux)
-- Accounting and pull-print stacks used in the field, including **PaperCut** and **MyKey**
-- Other document-management and fleet tools the edition has been taught
+- The PC and network the device is on (Windows, macOS, Linux)
+- Field stacks the edition has been taught, including **PaperCut** and **MyQ**
+- Other document-management and fleet tools in that pack
 
-When the edition has a procedure, it gives the next exact step.  
-When it does not, it is supposed to **stop**, name the gap, and ask for the missing fact or a source — not invent a part number, a firmware level, or a “works on my machine” fix.
+When there is a procedure, give the next exact step.  
+When there is not, **stop**, name the gap, ask for the page or the fact.
+Do not invent a part number. After someone supplies the research, keep it.
 
-That gap behavior is the product. After the tech (or admin) supplies the missing research, it is written into memory / skills so the next session does not start from zero.
+## In the box today
 
-## What is in the box today
-
-| Layer | What you get now |
+| Layer | Now |
 |---|---|
-| Engine | Hermes Agent: tools, memory, skills, cron, gateway, local or cloud models, Docker / SSH / other backends |
-| Chassis | Portable checkout + sibling venv + `HERMES_HOME` on the same drive |
+| Pocket path | USB / SSD, 8 GB or larger, double-click Start North Forge |
 | Public overlays | Field-service voice, Pocket Penny, Pine Barron Farms |
-| Private edition (admin) | TSC skills: intake, ticket, KB draft, escalation, fault log, training, vendor research |
-| Honesty rules | Label fact vs guess. Do not fill holes with confident fiction. Ask for the missing evidence. Persist what you were just taught. |
-| Hands | Terminal UI now. Messaging gateway (Telegram, Discord, Slack, and the rest) when you turn it on. |
+| Private edition | Intake, ticket, KB draft, escalation, fault log, training |
+| Honesty | Fact / sourced / inferred / unknown. No confident fiction. |
+| Voice | Senior on the desk. No “Great question.” |
+| Hands | Typed session today. Messaging gateway optional. |
 
-Built-in *engine* tasks are numerous (files, terminal, browser, memory, cron, subagents). Built-in *TSC* tasks are the edition skill list, not a hidden second program.
+Built-in *engine* tasks (files, terminal, browser, memory, schedule) are
+there so the pack can work. The teammate does not need their names.
 
-## What it is not (yet)
+## Not yet — do not demo as shipped
 
-Say these out loud so a demo does not overpromise:
-
-- Not a magic hallucination “scanner.” It is a working rule: separate known / sourced / inferred / unknown, and refuse to ship a guess as a KB.
-- Not a full graphical console. Deploy Console is admin-only for building sticks. Day-to-day is still the agent UI.
-- Not a database product. Memory and files today; a real parts / ticket / KB database is planned.
-- Graphing, slide decks, video, and image *generation as first-class TSC tools* are planned, not the current teammate path.
-- Offline only works if a **local model** and the edition content are already on the stick. Cloud models need a network.
+- Not a magic lie detector. It is a working rule about holes.
+- Not a full graphical console for the tech (admin Deploy Console only).
+- Not a database product yet.
+- Graph / slides / video / picture tools in the TSC loop are planned.
+- Offline only with a **local** model on the stick. Cloud needs a network.
 
 ## Portable and Docker
 
-- **USB / SSD:** plan on **8 GB or larger** for a full portable build (engine + venv + edition). A 256 KB stick cannot hold this. Use a normal thumb drive or an external SSD; size is not the limit once you are past that floor.
-- **No install on the teammate PC** for the USB path. Double-click Start North Forge.
-- **Docker / server:** the engine already runs in containers and remote backends. That is an admin / lab path, not what you hand a hotline tech on day one.
-- **Windows is the supported teammate path today.** macOS / Linux can run the engine; the one-click stick story is Windows first.
+Windows teammate path first. macOS / Linux can run the same checkout; the
+one-click stick story is Windows. Docker and remote backends exist for
+admin / lab use, not for the hotline handoff.
 
-## Roadmap (do not demo as shipped)
+## Roadmap
 
-1. Database-backed KB / asset / ticket memory  
-2. A real graphical workbench for techs who will not use a terminal  
-3. First-class graph, presentation, video, and image tools in the TSC loop  
-4. More manufacturer editions (Sharp, Ricoh, Xerox, custom fleets)  
-5. Cleaner offline packs (local model + edition, no API)
+1. Database-backed KB / asset / ticket memory
+2. A real window for techs who will not use a terminal
+3. Graph, presentation, video, and image tools in the support loop
+4. More manufacturer editions
+5. Cleaner offline packs
 
-## How to talk about it in one paragraph
+## Thanks
 
-North Forge is a portable technical-support assistant. The public repo is a working agent anyone can run. An administrator loads a private edition so the same stick can work a Kyocera (or later Sharp, Ricoh, Xerox) call across the device, the PC, and the print-management stack — and is trained to mark a hole instead of making one up. When you fill the hole, it keeps the answer.
+The runtime is [Hermes Agent](https://github.com/NousResearch/hermes-agent)
+by Nous Research and contributors (MIT). Thank you. It stays at the bottom
+so the first page is the job, not the vendor list.

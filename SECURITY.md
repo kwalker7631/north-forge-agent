@@ -265,8 +265,8 @@ private-disclosure channel and don't receive advisories.
   output — via injected content, hallucination, training artifacts,
   or any other cause — is not itself a vulnerability. "I achieved
   prompt injection" without a chained §3.1 outcome is not an
-  actionable report under this policy.
-- **Consequences of a chosen isolation posture.** Reports that a
+  Actionable report under this policy.
+- **Consequences of a chosen isolation posture. ** ** **** Reports that a
   code path operating within its posture's scope can do what that
   posture permits are not vulnerabilities. Examples: shell or file
   tools reaching host state under the local backend; code-execution
@@ -274,26 +274,26 @@ private-disclosure channel and don't receive advisories.
   isolation that only sandboxes shell; reports whose preconditions
   require pre-existing write access to operator-owned configuration
   or credential files (those are already inside the trust envelope).
-- **Documented break-glass settings.** Operator-selected trade-offs
+- **Documented break-glass settings. ** **** Operator-selected trade-offs
   that explicitly disable protections: `--insecure` and equivalent
   flags on the dashboard or other components, disabled approvals,
   local backend in production, development profiles that bypass
-  hermes-home security, and similar. Reports against those
+  Hermes-home security, and similar. Reports against those
   configurations are not vulnerabilities — that's the flag's job.
-- **Community-contributed skills and plugins.** Third-party skills
+- **Community-contributed skills and plugins. ** **** Third-party skills
   (including the community skills repository) and third-party
   plugins are in the operator's review surface, not Hermes Agent's
   trust surface (§2.4, §2.5). A skill or plugin doing something
   malicious is the expected failure mode of one that wasn't
   reviewed, not a vulnerability in Hermes Agent. Bugs in Hermes
-  Agent's skill-install or plugin-install path that prevent the
+  Agent's skill-install or plugin-install path that prevents the
   operator from seeing what they're installing are in scope under
   §3.1.
-- **Public exposure without external controls.** Exposing the
+- **Public exposure without external controls **.** Exposes
   gateway or API to the public internet without authentication,
   VPN, or firewall.
 - **Tool-level read/write restrictions on a posture where shell is
-  permitted.** If a path is reachable via the terminal tool, reports
+  permitted. **** If a path is reachable via the terminal tool, reports
   that other file tools can reach it add nothing.
 
 ---
@@ -315,12 +315,12 @@ that:
   network policy layer to restrict egress.
 - Configure a caller allowlist for every network-exposed adapter
   you enable (§2.6).
-- Review third-party skills and plugins before install (§2.4,
+- Review third-party skills and plugins before installing (§2.4,
   §2.5). For skills, this means reading the Python and scripts,
-  not just SKILL.md. Skills Guard reports and the install audit
+  not just SKILL.md. Skills Guard reports, and the install audit
   log are the review surface.
 - Hermes Agent includes supply-chain guards for MCP server
-  launches and for dependency / bundled-package changes in CI; see
+  launches and for dependency/bundled-package changes in CI; see
   `CONTRIBUTING.md` for specifics.
 
 ---

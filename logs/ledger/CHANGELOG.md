@@ -8,6 +8,23 @@ Heading format: `## [NF-vX.Y.Z] — YYYY-MM-DD — hermes@<sha> (N behind upstre
 
 ---
 
+## [NF-v0.11.0] — 2026-09-11 — hermes@8d79c2ff57 (217 behind upstream/main)
+
+**`RUN-2026-09-11-001` — `private-editions/` discovery path for named vertical skill-sets (e.g. Kyocera).** MINOR — new capability, no access-tier enforcement change. Kenneth's instruction: a named vertical skill-set is real proprietary content (not a persona overlay), so it never belongs in the public `editions/` tree — it lives in its own private repo, structured the same way (`distribution.yaml` + `SOUL.md` + `skills/`), and gets git-cloned directly into a sibling `private-editions/<name>/` at the repo root.
+
+**`CHG-2026-09-11-001`** — `.gitignore`: added `private-editions/` (whole subtree, never tracked). `scripts/nf-setup.ps1`: the per-edition install-source resolution (`$srcDir`, previously hardcoded to `editions/<name>/` only) now falls back to `private-editions/<name>/` when `editions/<name>/` has no `distribution.yaml`; header docstring updated to describe the fallback. `editions/README.md`: new "Private editions" section documenting the mechanism (the private repo's own access control is the security boundary for "can this be installed"; the existing admin passcode / tier gate in `hermes_cli/nf_tier.py`, unchanged, still governs "can a given drive switch into it").
+
+Verified this session, not just read from code (all against a real local clone at `private-editions/kyocera/`, populated from `kwalker7631/north-forge-hermes-edition` after that repo's own restructuring — see its session report):
+- `hermes_cli.profile_distribution._stage_source('private-editions/kyocera', …)` resolves the manifest (`name: kyocera`, `version: 0.1.0`) via plain filesystem calls — confirmed by direct invocation, not inspection alone. Git-tracked/staged/ignored status of the source directory is irrelevant to it, so gitignoring `private-editions/` does not block installation.
+- `hermes profile install private-editions/kyocera -y` (real CLI, isolated scratch `HERMES_HOME`) succeeds end-to-end: `hermes profile list` and `hermes profile info kyocera` both show it correctly (`kyocera@0.1.0`).
+- `git status` / `git add -A && git status` show nothing from `private-editions/` after populating it — confirmed the ignore holds, not assumed.
+- `/edition` (`hermes_cli/slash_exec.py::_exec_edition`) needs no change — it sources its "Installed editions" menu from `list_profile_names()` (`hermes_cli/profiles.py:280`), a disk scan of `<HERMES_HOME>/profiles/`, so it will list `kyocera` automatically once installed, same as any other profile.
+- `hermes_cli.nf_tier.enforce_startup_profile` has no edition-specific branch — a Full-tier `-p kyocera` / `hermes profile use kyocera` resolves identically to any other installed profile. No new code needed for switching.
+
+**Also recorded, not part of this change:** re-added the `upstream` remote (lost when `D:` was wiped and re-cloned) and fetched it to record the coordinate above — `origin/main` is genuinely **217 commits behind `upstream/main`** now (merge-base `8d79c2ff57`, vs. the `0e9fc2cc15` / "0 behind" recorded as of `RUN-2026-09-10-002`). This gap opened from normal upstream velocity between sessions, not from anything in this run; syncing it is a separate follow-up, not attempted here.
+
+Run: `RUN-2026-09-11-001`
+
 ## [NF-v0.10.2] — 2026-09-10 — hermes@0e9fc2cc15 (0 behind upstream/main)
 
 **`RUN-2026-09-10-006` — sanity-checked the end-of-task logging pipeline

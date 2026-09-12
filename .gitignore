@@ -94,6 +94,8 @@ agent-browser/
 *.ppk
 *.pem
 privvy*
+# Private, admin-gated edition content - git-cloned directly, never tracked here
+private-editions/
 images/
 __pycache__/
 hermes_agent.egg-info/

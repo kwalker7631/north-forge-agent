@@ -17,7 +17,11 @@
     Forge generic chassis is the root ("default"). If the pin (or, on Full, a
     -Installed name) is not a profile yet but editions\<name>\ is in the checkout,
     it is installed automatically via `hermes profile install` before the record
-    is written. -SkipEditionInstall turns that off (you manage profiles yourself).
+    is written. private-editions\<name>\ (gitignored, admin-gated content the
+    owner git-clones directly - see editions/README.md's "Private editions"
+    section) is checked as a fallback when editions\<name>\ has no
+    distribution.yaml. -SkipEditionInstall turns that off (you manage profiles
+    yourself).
     Two tiers, no third:
 
       full   - the pin is only the default landing edition; every switch path stays
@@ -227,13 +231,26 @@ if (-not $SkipEditionInstall -and $editionsToInstall.Count -gt 0) {
             continue
         }
         $srcDir = Join-Path $RepoRoot (Join-Path 'editions' $name)
+        $srcLabel = "editions\$name"
         if (-not (Test-Path -LiteralPath (Join-Path $srcDir 'distribution.yaml'))) {
-            Write-Warning ("Pin '$name' has no profile and no editions\$name\distribution.yaml in the checkout. " +
-                "Provisioning will still record the pin, but the drive has nothing to load for it. " +
-                "Install it yourself (hermes profile install <source>) or fix the -Pin name.")
+            # Not a public edition - check the gitignored private-editions/ slot before
+            # giving up (private, admin-gated content git-cloned directly by the owner;
+            # see private-editions/README.md and editions/README.md's private-editions note).
+            # See editions/README.md's "Private editions" section for how this slot gets populated.
+        $privateSrcDir = Join-Path $RepoRoot (Join-Path 'private-editions' $name)
+            if (Test-Path -LiteralPath (Join-Path $privateSrcDir 'distribution.yaml')) {
+                $srcDir = $privateSrcDir
+                $srcLabel = "private-editions\$name"
+            }
+        }
+        if (-not (Test-Path -LiteralPath (Join-Path $srcDir 'distribution.yaml'))) {
+            Write-Warning ("Pin '$name' has no profile and no editions\$name (or private-editions\$name) " +
+                "distribution.yaml in the checkout. Provisioning will still record the pin, but the drive " +
+                "has nothing to load for it. Install it yourself (hermes profile install <source>) or fix " +
+                "the -Pin name.")
             continue
         }
-        Write-Host "  edition        : installing '$name' from editions\$name ..."
+        Write-Host "  edition        : installing '$name' from $srcLabel ..."
         $instArgs = @('profile', 'install', $srcDir, '-y')
         if ($Force) { $instArgs += '--force' }
         Invoke-Hermes $instArgs

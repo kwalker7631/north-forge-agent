@@ -54,3 +54,32 @@ style, guardrails. It does **not** carry proprietary or personal vertical *conte
   [`pine-barron-farms/canon/README.md`](pine-barron-farms/canon/README.md).
 
 See [`../BRANDING.md`](../BRANDING.md) for which surfaces North Forge owns.
+
+## Private editions
+
+A named vertical skill-set (e.g. Kyocera) is real proprietary content — not a
+persona overlay — so it never lives under `editions/`. Instead it lives in its
+own private git repo, structured the same way (`distribution.yaml` + `SOUL.md`
++ `skills/`), and gets git-cloned directly into a sibling `private-editions/`
+folder at the repo root:
+
+```
+git clone git@github.com:<owner>/<private-edition-repo>.git private-editions/kyocera
+```
+
+`private-editions/` is listed in `.gitignore` — the whole subtree is untracked
+here, on purpose. That's sufficient: `hermes profile install` (and the
+`private-editions/<name>/` fallback in `scripts/nf-setup.ps1`, checked when
+`editions/<name>/` has no manifest) reads a local directory source with plain
+filesystem calls — git-tracked, staged, or ignored status makes no difference
+to it. The private repo's own access control (who can clone it) is the actual
+security boundary for "can this be installed at all"; the existing admin
+passcode / tier gate (`hermes_cli/nf_tier.py`) still governs the separate
+question of "can a given drive switch into it."
+
+```
+scripts\nf-setup.ps1 -NonInteractive -Tier full -Pin kyocera -Installed kyocera
+```
+
+behaves identically whether `kyocera` resolves from `editions/kyocera/` or
+`private-editions/kyocera/` — the fallback is silent from the operator's side.

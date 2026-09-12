@@ -3,15 +3,15 @@
 You already have Google. You already have a chatbot in a browser.
 That is not the problem.
 
-The problem is a tech on a live call who types **what is an F248** and gets
+The problem is a tech on a live call who asks for a service code and gets
 a paragraph that sounds smart and is wrong. They give up. The machine is
 still down. That is not stupidity. That is a tool that asked them to be a
 prompt engineer on a service call.
 
 North Forge is the opposite of that.
 
-Plug in the stick. Double-click **Start North Forge**. Type the code, the
-model, what you already tried, in ordinary English. It is supposed to answer
+Plug in the stick. Double-click **Start North Forge**. Type the device, the
+code, and what you already tried, in ordinary English. It is supposed to answer
 like a senior on the desk who has seen the call before — and to say “I don’t
 have that, send me the page” instead of making one up.
 
@@ -28,8 +28,8 @@ It is not a test. There is no prompt to memorize.
 ## Why Google is not enough
 
 Google is a pile of pages. A general chatbot is a pile of pages with manners.
-Neither one knows *your* fleet, *your* last three tickets, or that F248 on
-*this* model is not the same story as F248 on the last one.
+Neither one knows *your* fleet, *your* last three tickets, or that the same
+code on *this* model is not always the same story as the last one.
 
 A usable answer on this job is short, ordered, and honest:
 
@@ -72,7 +72,7 @@ Do not format the stick. Do not “set up Python.” Do not learn a vendor.
 Kenneth C. Walker Jr. — decades on this industry, including the years when
 the answer lived in a binder and a senior, not in a search box. The pace of
 new tools is the problem. This pack is how the work got compartmentalized
-so a teammate does not have to drink the whole firehose to clear one code.
+so a teammate does not have to drink the whole firehose to clear one call.
 
 Future work (database, a real window instead of a terminal, slides / video /
 pictures in the loop, more manufacturers) is listed in

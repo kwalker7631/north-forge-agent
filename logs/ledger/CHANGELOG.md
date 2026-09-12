@@ -8,6 +8,11 @@ Heading format: `## [NF-vX.Y.Z] — YYYY-MM-DD — hermes@<sha> (N behind upstre
 
 ---
 
+## [NF-v0.11.3] — Unreleased — hermes@a1f6e499d1 (515 behind upstream/main)
+
+### Fixed
+- **CHG-2026-09-12-001** — `logs/ledger/INDEX.md`'s "Open incidents" table still listed `ERR-2026-09-10-001` as open; `errors/ERROR-LOG.md` and the code (`hermes_cli/main.py:599`, `_desktop_ssh_backend` present) already showed it resolved by `CHG-2026-09-10-003`. Moved the row to "Resolved incidents", removed from "Open incidents", corrected the footnote. Ledger-only, no code change. Paths: `logs/ledger/INDEX.md`. Ref: ERR-2026-09-10-001. Run: RUN-2026-09-12-001.
+
 ## [NF-v0.11.2] — 2026-09-11 — hermes@8d79c2ff57 (228 behind upstream/main)
 
 **`RUN-2026-09-11-002` — ERR-2026-09-11-001: `origin/main` force-reset to upstream by GitHub fork-sync, wiping all 186 fork commits (2nd occurrence).** PATCH — incident response + repo-config hardening, no application code change. Owner reported README.md "reverted to Hermes-forward content again" and asked for the actual mechanism, not a blind re-patch. Traced it past the file diff: `README.md`'s own history never reverted (every `Merge branch 'NousResearch:main' into main` kept branding; a `git merge-tree` simulation of the next upstream sync confirmed a clean, non-conflicting merge). `git fetch origin main` reported a forced update — `origin/main`'s tip had been reset to an upstream `NousResearch/hermes-agent` commit wholesale (confirmed via `merge-base --is-ancestor`), taking every one of the 186 fork-only commits with it (branding, `SOUL.md`, `BRANDING.md`, the ledger, the CLI skin, the installer — not just `README.md`). This is GitHub's fork-sync "Discard commits" / `merge-upstream` mechanism, gated by its own `allow_fork_syncing` permission — a branch-level ref replacement, not a per-file merge, so no `.gitattributes` merge strategy could ever have caught it. `main` had zero branch protection. Full detail: ERR-2026-09-11-001; safeguard rationale: DECISION-2026-09-11-001.

@@ -5,56 +5,58 @@
 </p>
 
 <p align="center">
-  <strong>A portable technical-support assistant for the service desk.</strong><br>
-  Plug in the drive, start it, and describe the problem in ordinary English.
+  <strong>A portable senior for the service desk.</strong><br>
+  Built for people who still believe the work is worth doing well.
 </p>
 
 <p align="center">
   <a href="START_HERE.md"><img src="https://img.shields.io/badge/Start-START_HERE.md-0B1F3A?style=for-the-badge" alt="Start here"></a>
+  <a href="CAPABILITIES.md"><img src="https://img.shields.io/badge/What%20it%20can%20do-CAPABILITIES.md-2563EB?style=for-the-badge" alt="Capabilities"></a>
   <a href="PRODUCT.md"><img src="https://img.shields.io/badge/Product-PRODUCT.md-1E3A5F?style=for-the-badge" alt="Product"></a>
-  <a href="CAPABILITIES.md"><img src="https://img.shields.io/badge/Scope-CAPABILITIES.md-2563EB?style=for-the-badge" alt="Capabilities"></a>
   <a href="DOCS.md"><img src="https://img.shields.io/badge/Docs-DOCS.md-4B5563?style=for-the-badge" alt="Documentation"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
 </p>
 
 ---
 
-North Forge is an **agentic conversational assistant for technical support
-teams**, running on [Hermes Agent](https://github.com/NousResearch/hermes-agent)
-(Nous Research's tool-calling LLM engine) with a Windows-first portable
-launcher, a drive-local storage layout, and a Full/Basic tier gate on top. Under
-the hood it is the same class of system as any Hermes deployment — file,
-terminal, browser, memory, scheduling, and gateway tools driven by whatever
-model you point it at, cloud or local — packaged so a non-technical teammate
-can plug in a drive and start talking instead of configuring an agent runtime.
+This project exists because the job is hard and the tools we were handed were not honest enough.
 
-That packaging is deliberately split in two. **This repository is the
-chassis** — the engine, the launcher, the tier/passcode gate, the declarative
-cron-sync that keeps a skill's own schedule registered without anyone typing a
-command, and a generic support voice with no manufacturer content in it.
-Manufacturer procedures — fault-code trees, firmware history, the actual
-field knowledge a tech needs — live in a separate **private edition**
-(Kyocera today; other manufacturers can start from the [OEM template](editions/OEM.md))
-that installs into this chassis as a Hermes profile. Neither half is much use
-alone: the chassis without an edition is a competent generalist with nothing
-manufacturer-specific to say, and an edition's knowledge only reaches a
-teammate through this chassis's runtime, tiering, and launcher. The private
-edition is closer to a key than a decoration — it is what turns a general
-assistant into one that actually knows this manufacturer's equipment.
+A technician on a live call should not have to write an eight-thousand-character prompt. They should describe the device, the symptom, and what they already tried — the way they would tell a senior who has been on the floor. North Forge is that senior in a pocket: a drive you plug in, a window you start, a voice that stays with the work.
+
+It is not a chatbot wearing a new jacket. It is years of technical-support instinct, compartmentalized so a teammate does not have to drink the whole firehose to clear one call. When the pack knows the next step, it gives it. When it does not, it says so. That is the point. Confidence without the page is not help.
+
+The public repository is the **chassis**. The manufacturer pack — the real procedures, the templates, the shop memory — is a private edition an administrator loads onto the drive. Kyocera is first. Other makers can use the same slot.
+
+Maintained by **Kenneth C. Walker Jr.**, for people who still take the desk seriously.
+
+## What it can do
+
+| It can | Meaning |
+|---|---|
+| Sit on the call with you | Device, paper path, finish, supplies, the PC, the network, PaperCut, MyQ, and the rest of the document stack the edition has been taught |
+| Speak like the desk | Short. Ordered. Look first. Do not touch yet. Grab this. Name what is still unknown |
+| Refuse to invent | Built to show a hole instead of filling it with a plausible paragraph |
+| Keep what the shop teaches | When a senior supplies the missing page, that answer is supposed to stay |
+| Live on a drive | USB or SSD. Eight gigabytes or larger. Memory travels with the stick |
+| Work for the person holding it | Plug in. Start North Forge. Talk. `/menu` if you get lost |
+| Carry an edition | Locked to one manufacturer for a teammate. Open for an administrator who must switch packs |
+| Learn in the background | On an always-on admin PC, scheduled research can watch public product notes. A stick in a drawer does not pretend to study overnight |
+| Travel to another maker | Sharp, Ricoh, Xerox, or an in-house fleet — same chassis, different private pack |
+
+That is the power. Not a longer feature list. A tool that stays on the floor with you.
+
+Full inventory and honest limits: **[CAPABILITIES.md](CAPABILITIES.md)**.
+
+## Who this is for
 
 | Who | What they do |
 |---|---|
-| **Teammate** | Plug in a prepared drive, double-click **Start North Forge**, and talk normally. |
-| **Administrator** | Builds and updates the drive, selects an AI service or local model, and installs the private edition. |
-| **This repository** | Supplies the public runtime, launchers, Pocket Penny, Pine Barron Farms, and field-service voice. |
-| **Private edition** | Supplies manufacturer procedures, skills, and templates. |
+| **The technician** | Plug in a prepared drive, double-click **Start North Forge**, describe the job. No GitHub. No class. |
+| **The administrator** | Builds the drive, chooses a cloud service or a local model, installs the private edition, hands it over. |
+| **This repository** | Engine, Windows launcher, portable layout, public overlays (Pocket Penny, Pine Barron Farms, field-service voice). |
+| **The private edition** | Manufacturer procedures, skills, templates, deploy console. That is the product. |
 
-> **Important:** cloning this repository gives you the generic chassis, not the
-> private Kyocera knowledge pack. North Forge can use a cloud AI service (an
-> online service that answers the assistant) or a separately configured local
-> model. Cloud services require internet access and may charge for use.
-
-Maintained by **Kenneth C. Walker Jr.**
+> **Important.** Cloning this repository gives you the chassis, not the private knowledge pack. A cloud model needs a network and may cost money. A local model has to be installed on purpose. Neither one is a license to skip verifying a safety-critical step.
 
 ## Start here
 
@@ -65,8 +67,7 @@ Maintained by **Kenneth C. Walker Jr.**
 3. Describe the device, the symptom, and what you already tried.
 4. Type `/menu` if you get lost.
 
-You do **not** need GitHub, Python, or a class. Do not format the drive.
-Assigned drives normally use a label such as `GREGW-NORTH`.
+Do not format the drive. Assigned labels look like `GREGW-NORTH`.
 
 **Preview**
 
@@ -78,24 +79,13 @@ Let's check the connection and credentials in order. First, what model is it,
 and does the destination PC still open the shared folder?
 ```
 
-Tip: press **Ctrl+C** once to stop the terminal session. You can close the
-window with **Alt+F4** after it stops.
+Stop the session with **Ctrl+C**. Close the window with **Alt+F4** after it stops.
 
-### I am an administrator building from source
+### I am building from source
 
-Use this path only for a lab machine or for preparing a drive. Finished teammate
-drives should be built by the private deployment console, not by asking each
-teammate to clone GitHub.
+Finished teammate drives should come from the private deploy console. This path is for a lab machine.
 
-**You need:**
-
-- Windows 10 or 11 with PowerShell 5.1 or newer
-- An internet connection for the first installation
-- Git for the clone command
-- An 8 GB or larger USB drive or portable SSD
-- Python 3.11 or newer when available; the bootstrap can fetch its own copy
-
-Open **PowerShell**, then run:
+You need Windows 10 or 11, PowerShell 5.1 or newer, Git, internet for the first install, and an 8 GB or larger drive.
 
 ```powershell
 git clone https://github.com/kwalker7631/north-forge-agent.git
@@ -103,172 +93,67 @@ cd north-forge-agent
 .\north-forge.cmd
 ```
 
-The first launch creates the Python environment and data folder beside the
-checkout, then starts the setup flow. Choose an AI provider (the service or
-local program that supplies the model) when prompted. Later launches reuse that
-setup. If `North-Forge-Setup.exe` is already present at the drive root, you can
-double-click it instead.
-
-To see which edition and version a prepared drive uses:
+The first launch builds the environment beside the checkout. Choose a provider when asked. Later launches reuse that setup.
 
 ```powershell
 scripts\nf-setup.ps1 -Show
 ```
 
-Tip: in PowerShell, press **Up Arrow** to reuse the previous command. One-line
-installers from the Hermes website install stock Hermes, not this North Forge
-checkout.
+One-liners on the Hermes website install stock Hermes, not this checkout.
 
-## What is included
+## What is included — and what is not
 
-- The Hermes conversational agent runtime and command-line interface
-- A Windows launcher that repairs its portable Python environment when needed
-- Drive-local configuration, conversations, memories, and logs
-- File, terminal, browser, memory, scheduling, gateway, TUI, and desktop
-  capabilities inherited from Hermes
-- Declarative cron sync (`scripts/nf_sync_cron.py`): any installed skill that
-  declares a `cron:` block in its own `SKILL.md` gets that job registered
-  automatically on every launch and right after provisioning — no manual
-  `/cron add`, no model/provider pin, so it runs the same on Basic and Full tier.
-  The same pass also installs and starts the Hermes gateway service itself
-  (the process that actually fires a scheduled job) the first time any skill
-  needs one, using the same zero-prompt path `hermes setup` already relies on
-  — so a scheduled job is live end to end without anyone running `hermes
-  gateway install` by hand.
-- Generic North Forge support voice and public example overlays
+**Included:** the conversational runtime, a Windows launcher that can repair its own environment, drive-local memory and logs, file and terminal and browser tools, scheduling, a messaging gateway, a terminal UI, and the public overlays.
 
-## Gateway service requirements
+**Not included here:** private manuals, fault-code shops, customer data, a promise that every answer is correct, a ready-made offline brain, or a finished graphical console for the tech.
 
-The automatic gateway install described above runs the same install path as
-typing `hermes gateway install` yourself. What it needs to actually succeed —
-rather than back off and print a manual fallback — depends on the platform:
-
-**Windows**
-
-- No administrator rights needed for the normal path: it registers a
-  Scheduled Task that starts at your next login, using the `/RL LIMITED` run
-  level, which a standard (non-admin) account can create.
-- If the account is locked down enough that Windows still denies the
-  Scheduled Task, install falls back to a Startup-folder shortcut instead of
-  failing outright.
-- You can also decline auto-start-on-login when asked and run
-  `hermes gateway start` yourself later.
-
-**Linux (systemd)**
-
-- Needs a real, running systemd instance with `systemctl` on `PATH` — not a
-  bare container or CI image where systemd isn't the init process, and not a
-  WSL distro that has systemd disabled. Install detects this and prints
-  guidance instead of pretending it worked.
-- Needs a reachable user D-Bus session. A normal desktop login already has
-  one; a headless box or a fresh SSH session usually doesn't. Install tries
-  `loginctl enable-linger <you>` automatically — that succeeds without sudo
-  when the system's polkit policy allows it, otherwise you'll see a
-  `sudo loginctl enable-linger <you>` command to run once by hand.
-- Linger has to stay enabled, or the service can be killed the moment your
-  session ends — it's what lets a user-scope service survive logout.
-- If none of that is available, install reports the specific gap and backs
-  off cleanly rather than blocking your launch; `hermes gateway run` keeps
-  the gateway alive in the foreground as a manual, no-install fallback.
-
-**macOS** uses `launchd` and normally needs no extra setup — noted here only
-for completeness, since it's the third platform the same install path covers.
-
-On any platform, if the automatic step can't finish, North Forge still
-starts normally — a scheduled job is saved but won't fire until the
-platform-specific requirement above is resolved (or you run
-`hermes gateway install` by hand after resolving it).
-
-## What is not included
-
-- Private manufacturer manuals, fault-code procedures, or customer data
-- A guarantee that an AI answer is correct; technicians must verify safety- or
-  business-critical steps
-- A fully offline model; offline use requires an administrator to install and
-  configure one separately
-- A finished graphical teammate console; the current teammate path is terminal-first
-
-See [CAPABILITIES.md](CAPABILITIES.md) for the shipped/not-yet inventory and
-[PRODUCT.md](PRODUCT.md) for the short product boundary.
+See [CAPABILITIES.md](CAPABILITIES.md) and [PRODUCT.md](PRODUCT.md).
 
 ## Portable storage and privacy
 
-The checkout, Python environment, and North Forge data folder live beside one
-another on the portable drive. The launcher does not use Windows AppData for
-this setup. It also rebuilds the environment when moving between incompatible
-PCs; your data folder is kept separate.
+The checkout, the Python environment, and the data folder live next to each other on the drive. Treat that drive like a work laptop. Do not commit the data folder. Report a lost assigned stick. Cloud providers have their own terms.
 
-Conversations, configuration, memories, logs, and saved credentials can remain
-on the drive. Treat it like a work laptop: keep it physically secure, do not
-commit its data folder to Git, and report a lost assigned drive. Content sent to
-a cloud AI service is also subject to that service's privacy terms.
-
-Do not rename the checkout folder casually: its name determines the neighboring
-data-folder name. If a rename is detected, the launcher asks whether to reuse
-the old data rather than choosing silently.
+Do not rename the checkout folder casually. The neighboring data folder follows that name.
 
 ## Everyday commands
 
 | Action | Command |
 |---|---|
 | Start | **Start North Forge** or `north-forge.cmd` |
-| Show the in-session menu | `/menu` |
-| Open this documentation set | `/readme` or `/readme north-forge-agent` |
-| Open private Kyocera docs (when installed) | `/readme kyocera` |
-| Start a clean conversation | `/new` |
-| Select or repair the AI provider | `hermes model` |
-| Run the full setup wizard | `hermes setup` |
-| Check engine health | `hermes doctor` |
-| Show the prepared-drive edition | `scripts\nf-setup.ps1 -Show` |
+| Menu | `/menu` |
+| This documentation set | `/readme` or `/readme north-forge-agent` |
+| Private edition docs (when installed) | `/readme kyocera` |
+| New conversation | `/new` |
+| Provider | `hermes model` |
+| Setup wizard | `hermes setup` |
+| Health | `hermes doctor` |
+| What this drive is pinned to | `scripts\nf-setup.ps1 -Show` |
 
-Command help text: **“Type `/menu` to see chat actions. Run `hermes --help` in
-PowerShell to see administrator commands.”**
-
-## Troubleshooting and logs
+## Troubleshooting
 
 | What you see | What to do |
 |---|---|
-| Windows says `git` is not recognized | Install [Git for Windows](https://git-scm.com/download/win), reopen PowerShell, and retry. |
-| Setup cannot download packages | Check the internet connection and company proxy, then run `.\north-forge.cmd` again. |
-| The assistant opens but cannot answer | Run `hermes model` and confirm the selected provider and sign-in details. |
-| Automatic repair fails | Open the neighboring `north-forge-agent-launcher.log`; it records the failed readiness check. |
-| A conversation or setting appears missing after a folder rename | Restart with `north-forge.cmd` and choose **R** to reuse the detected data folder. Do not delete either folder. |
-| A scheduled job is saved but never fires ("gateway is not running yet") | See [Gateway service requirements](#gateway-service-requirements) above — usually a Linux D-Bus/linger gap or a blocked Windows Scheduled Task. Resolve it, then run `hermes gateway install`. |
+| `git` is not recognized | Install [Git for Windows](https://git-scm.com/download/win), reopen PowerShell, retry |
+| Setup cannot download | Check the network and proxy, run `.\north-forge.cmd` again |
+| It opens but cannot answer | `hermes model` — confirm the provider |
+| Repair fails | Read `north-forge-agent-launcher.log` beside the checkout |
+| Settings vanished after a rename | Restart and choose **R** to reuse the old data folder |
 
-The portable data folder is normally named `north-forge-agent-data`. Runtime
-logs are under `north-forge-agent-data\logs\`; the early launcher log is beside
-the checkout. When asking for help, remove passwords, access keys, and customer
-information before sharing a log.
-
-## Repository map
-
-| Path | Purpose |
-|---|---|
-| [`north-forge.cmd`](north-forge.cmd) | Windows entry point and portable-data setup |
-| [`agent/`](agent/) | Conversation loop, prompts, memory, and provider handling |
-| [`tools/`](tools/) | File, terminal, browser, and other agent capabilities |
-| [`gateway/`](gateway/) | Telegram, Discord, Slack, and other messaging connections |
-| [`apps/desktop/`](apps/desktop/) | Electron desktop application |
-| [`ui-tui/`](ui-tui/) | Terminal user interface |
-| [`skills/`](skills/) | Built-in instruction packs |
-| [`editions/`](editions/) | Public edition structure and OEM template |
-| [`website/`](website/) | Full Hermes engine documentation source |
-
-Developers should read [CONTRIBUTING.md](CONTRIBUTING.md) and the nearest
-`AGENTS.md` before editing an area. Use `scripts/run_tests.sh` rather than calling
-`pytest` directly.
+Strip passwords and customer names before you share a log.
 
 ## Documentation
 
 - [Documentation map](DOCS.md)
-- [Why North Forge exists](START_HERE.md)
-- [Current capabilities and limits](CAPABILITIES.md)
-- [Learning and memory](LEARNING.md)
+- [Why this exists](START_HERE.md)
+- [Capabilities and limits](CAPABILITIES.md)
+- [How it learns](LEARNING.md)
+- [OEM template](editions/OEM.md)
 - [Hermes engine reference](https://hermes-agent.nousresearch.com/docs/)
-- [Issues for this fork](https://github.com/kwalker7631/north-forge-agent/issues)
+
+Developers: [CONTRIBUTING.md](CONTRIBUTING.md) and the nearest `AGENTS.md`. Run `scripts/run_tests.sh`.
 
 ## Thanks
 
-North Forge uses [Hermes Agent](https://github.com/NousResearch/hermes-agent)
-by Nous Research and its contributors under the MIT license. Engine problems
-that are not specific to this fork belong in the upstream Hermes project.
+The runtime is [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research and contributors (MIT). That work is real. It is listed last so the first page is the job.
+
+Engine issues that are not this fork belong upstream. Issues for North Forge: [this repository](https://github.com/kwalker7631/north-forge-agent/issues).

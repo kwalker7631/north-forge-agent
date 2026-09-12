@@ -1,0 +1,71 @@
+name: nf-branding-guard
+
+# North Forge branding guard — defense-in-depth detection layer.
+#
+# CHG-2026-09-11-001 / DECISION-2026-09-11-001: origin/main was reset twice by
+# GitHub's fork-sync ("Sync fork" / merge-upstream), which force-replaces the
+# branch tip with NousResearch/hermes-agent's and silently discards every
+# fork-only commit — README.md branding included, but not only README.md.
+# That is a branch-level operation, not a per-file merge, so no .gitattributes
+# merge strategy or file-level exclusion can catch it. The structural fix is
+# branch protection (allow_force_pushes: false, allow_fork_syncing: false,
+# enforce_admins: true — see logs/ledger/). This workflow is the belt-and-
+# suspenders check: if a North-Forge-owned identity surface ever loses its
+# identity markers — reset, bad merge, manual mistake, anything — this fails
+# loudly instead of the drift sitting unnoticed.
+#
+# Markers below are category-1 surfaces from BRANDING.md section 1. Update
+# both together if the canonical wording changes.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 13 * * *" # daily — catches drift from outside a push/PR (e.g. a fork-sync)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  branding-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Verify North-Forge identity markers are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+
+          check() {
+            file="$1"; pattern="$2"; label="$3"
+            if [ ! -f "$file" ]; then
+              echo "FAIL: $file is missing entirely"
+              fail=1
+              return
+            fi
+            if ! grep -qE "$pattern" "$file"; then
+              echo "FAIL: $file no longer contains $label"
+              fail=1
+            else
+              echo "OK: $file has $label"
+            fi
+          }
+
+          check "README.md" "^# North Forge" "the North Forge H1"
+          check "README.md" "North Forge is an AI agent you can make your own" "the North Forge lead sentence"
+          check "SOUL.md" "^You are North Forge\." "the North Forge identity line"
+          check "BRANDING.md" "North Forge is a fork of \[\`NousResearch/hermes-agent\`\]" "the fork-provenance statement"
+
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "One or more North-Forge-owned identity surfaces (BRANDING.md section 1)"
+            echo "no longer carry their North Forge identity markers. If this ran on a"
+            echo "schedule with no matching push/PR, check whether origin/main was reset"
+            echo "by a fork-sync (compare HEAD against upstream/main's tip)."
+            exit 1
+          fi

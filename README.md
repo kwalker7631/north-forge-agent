@@ -14,6 +14,8 @@
   <a href="CAPABILITIES.md"><img src="https://img.shields.io/badge/What%20it%20can%20do-CAPABILITIES.md-2563EB?style=for-the-badge" alt="Capabilities"></a>
   <a href="PRODUCT.md"><img src="https://img.shields.io/badge/Product-PRODUCT.md-1E3A5F?style=for-the-badge" alt="Product"></a>
   <a href="DOCS.md"><img src="https://img.shields.io/badge/Docs-DOCS.md-4B5563?style=for-the-badge" alt="Documentation"></a>
+  <a href="ARCHITECTURE.md"><img src="https://img.shields.io/badge/Architecture-ARCHITECTURE.md-1E293B?style=for-the-badge" alt="Architecture"></a>
+  <a href="LEARNING.md"><img src="https://img.shields.io/badge/Learning-LEARNING.md-4B5563?style=for-the-badge" alt="Learning"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
 </p>
 

@@ -10,6 +10,9 @@ Heading format: `## [NF-vX.Y.Z] — YYYY-MM-DD — hermes@<sha> (N behind upstre
 
 ## [NF-v0.11.3] — Unreleased — hermes@a1f6e499d1 (515 behind upstream/main)
 
+### Added
+- **CHG-2026-09-12-002** — `ARCHITECTURE.md` placed at the repo root: the Zone-B-equivalent engineering-audience architecture reference (two-repo boundary, profile install, tier/pin enforcement, `SOUL.md` override, the message-to-response turn loop, a Mermaid diagram), handed over verbatim by the owner as the explicit follow-up to this session's earlier README engineering-audience gap review and architecture-mechanics extraction (both cited by file/line in the doc itself). Placed byte-for-byte, no composition. `README.md`: added one badge link (`Architecture → ARCHITECTURE.md`) to the existing badge row, no other content changed. Paths: `ARCHITECTURE.md`, `README.md`. Run: RUN-2026-09-12-002.
+
 ### Fixed
 - **CHG-2026-09-12-001** — `logs/ledger/INDEX.md`'s "Open incidents" table still listed `ERR-2026-09-10-001` as open; `errors/ERROR-LOG.md` and the code (`hermes_cli/main.py:599`, `_desktop_ssh_backend` present) already showed it resolved by `CHG-2026-09-10-003`. Moved the row to "Resolved incidents", removed from "Open incidents", corrected the footnote. Ledger-only, no code change. Paths: `logs/ledger/INDEX.md`. Ref: ERR-2026-09-10-001. Run: RUN-2026-09-12-001.
 

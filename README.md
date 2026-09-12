@@ -5,105 +5,205 @@
 </p>
 
 <p align="center">
-  <strong>Portable technical support assistant</strong><br>
-  Your desk. Your pack. Ordinary English.
+  <strong>A portable technical-support assistant for the service desk.</strong><br>
+  Plug in the drive, start it, and describe the problem in ordinary English.
 </p>
 
 <p align="center">
   <a href="START_HERE.md"><img src="https://img.shields.io/badge/Start-START_HERE.md-0B1F3A?style=for-the-badge" alt="Start here"></a>
   <a href="PRODUCT.md"><img src="https://img.shields.io/badge/Product-PRODUCT.md-1E3A5F?style=for-the-badge" alt="Product"></a>
   <a href="CAPABILITIES.md"><img src="https://img.shields.io/badge/Scope-CAPABILITIES.md-2563EB?style=for-the-badge" alt="Capabilities"></a>
-  <a href="LEARNING.md"><img src="https://img.shields.io/badge/Learning-LEARNING.md-4B5563?style=for-the-badge" alt="Learning"></a>
+  <a href="DOCS.md"><img src="https://img.shields.io/badge/Docs-DOCS.md-4B5563?style=for-the-badge" alt="Documentation"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
 </p>
 
 ---
 
-North Forge is a **working assistant for technical support teams** — device, PC, network, and the document stack the edition has been taught. It is not a chatbot reskin.
+North Forge is a **working assistant for technical support teams**. It can help
+with devices, PCs, networks, and the document stack installed in its edition.
+It is designed to give short, ordered help and to identify missing knowledge
+instead of confidently inventing an answer.
 
-The public repository is the chassis: launchers, portable runtime, and public overlays. The manufacturer pack (Kyocera today; other OEMs later) is a private edition an administrator loads onto the stick.
+This public repository is the **chassis**: the agent engine, Windows launcher,
+portable storage layout, and generic support overlays. Manufacturer procedures
+are not published here. An administrator adds those through a private edition
+(Kyocera today; other manufacturers can use the [OEM template](editions/OEM.md)).
 
-A teammate should never have to become a prompt engineer on a live call. They plug the stick in, double-click **Start North Forge**, and describe the job the way they would tell a coworker. When the pack does not have the page, it is supposed to say so — then keep the answer once someone supplies it.
-
-| Layer | Role |
+| Who | What they do |
 |---|---|
-| **This repo** | Public chassis — engine, launchers, Pocket Penny, Pine Barron Farms, field-service voice |
-| **Private edition** | The TSC pack. Procedures, skills, templates |
-| **Teammate** | Plug in → Start North Forge → talk normally |
-| **Admin** | Builds the stick. Teammates do not clone GitHub |
+| **Teammate** | Plug in a prepared drive, double-click **Start North Forge**, and talk normally. |
+| **Administrator** | Builds and updates the drive, selects an AI service or local model, and installs the private edition. |
+| **This repository** | Supplies the public runtime, launchers, Pocket Penny, Pine Barron Farms, and field-service voice. |
+| **Private edition** | Supplies manufacturer procedures, skills, and templates. |
+
+> **Important:** cloning this repository gives you the generic chassis, not the
+> private Kyocera knowledge pack. North Forge can use a cloud AI service (an
+> online service that answers the assistant) or a separately configured local
+> model. Cloud services require internet access and may charge for use.
 
 Maintained by **Kenneth C. Walker Jr.**
 
-Documentation set: **[DOCS.md](DOCS.md)** · In session: `/readme north-forge-agent`
+## Start here
 
----
+### I was handed a prepared drive
 
-## Handed a stick?
-
-1. Plug it in and open the drive.
+1. Plug in the drive and open it in File Explorer.
 2. Double-click **Start North Forge**.
-3. Describe the device and the problem in ordinary English.
-4. If you get lost, type `/menu`.
+3. Describe the device, the symptom, and what you already tried.
+4. Type `/menu` if you get lost.
 
-You do not need GitHub, Python, or a class. Do not format the stick.
+You do **not** need GitHub, Python, or a class. Do not format the drive.
+Assigned drives normally use a label such as `GREGW-NORTH`.
 
-Assigned sticks use a volume name of **FIRSTL-NORTH** (example: Greg Warhol → `GREGW-NORTH`). The agent name is optional. Default is North Forge.
+**Preview**
 
----
+```text
+North Forge
+> The copier can print, but scan to folder stopped this morning.
 
-## What runs on the drive
+Let's check the connection and credentials in order. First, what model is it,
+and does the destination PC still open the shared folder?
+```
 
-The checkout, the Python environment, and the data folder live **on the stick**, next to each other. Nothing is written into Windows AppData. Unplug it and take it to another PC.
+Tip: press **Ctrl+C** once to stop the terminal session. You can close the
+window with **Alt+F4** after it stops.
 
-Minimum media for a teammate stick: **8 GB**. Windows first. macOS and Linux can run the same checkout; the one-click story is Windows.
+### I am an administrator building from source
 
----
+Use this path only for a lab machine or for preparing a drive. Finished teammate
+drives should be built by the private deployment console, not by asking each
+teammate to clone GitHub.
 
-## Admin / lab — first start from this repo
+**You need:**
 
-Use this only if you are building from source. Finished sticks skip it.
+- Windows 10 or 11 with PowerShell 5.1 or newer
+- An internet connection for the first installation
+- Git for the clone command
+- An 8 GB or larger USB drive or portable SSD
+- Python 3.11 or newer when available; the bootstrap can fetch its own copy
+
+Open **PowerShell**, then run:
 
 ```powershell
 git clone https://github.com/kwalker7631/north-forge-agent.git
+cd north-forge-agent
 .\north-forge.cmd
 ```
 
-Or double-click `North-Forge-Setup.exe` at the drive root when that file is present.
+The first launch creates the Python environment and data folder beside the
+checkout, then starts the setup flow. Choose an AI provider (the service or
+local program that supplies the model) when prompted. Later launches reuse that
+setup. If `North-Forge-Setup.exe` is already present at the drive root, you can
+double-click it instead.
 
-Requires Windows 10/11 and PowerShell 5.1+. Python 3.11+ if it is on PATH; otherwise bootstrap fetches its own.
-
-Check what a stick is pinned to:
+To see which edition and version a prepared drive uses:
 
 ```powershell
 scripts\nf-setup.ps1 -Show
 ```
 
-Locked teammate sticks are built from the **private** deploy console, not by asking a tech to clone this repository.
+Tip: in PowerShell, press **Up Arrow** to reuse the previous command. One-line
+installers from the Hermes website install stock Hermes, not this North Forge
+checkout.
 
-One-liners on the Hermes website install **stock Hermes**, not this checkout. Use them only if you want plain Hermes on the PC.
+## What is included
 
----
+- The Hermes conversational agent runtime and command-line interface
+- A Windows launcher that repairs its portable Python environment when needed
+- Drive-local configuration, conversations, memories, and logs
+- File, terminal, browser, memory, scheduling, gateway, TUI, and desktop
+  capabilities inherited from Hermes
+- Generic North Forge support voice and public example overlays
+
+## What is not included
+
+- Private manufacturer manuals, fault-code procedures, or customer data
+- A guarantee that an AI answer is correct; technicians must verify safety- or
+  business-critical steps
+- A fully offline model; offline use requires an administrator to install and
+  configure one separately
+- A finished graphical teammate console; the current teammate path is terminal-first
+
+See [CAPABILITIES.md](CAPABILITIES.md) for the shipped/not-yet inventory and
+[PRODUCT.md](PRODUCT.md) for the short product boundary.
+
+## Portable storage and privacy
+
+The checkout, Python environment, and North Forge data folder live beside one
+another on the portable drive. The launcher does not use Windows AppData for
+this setup. It also rebuilds the environment when moving between incompatible
+PCs; your data folder is kept separate.
+
+Conversations, configuration, memories, logs, and saved credentials can remain
+on the drive. Treat it like a work laptop: keep it physically secure, do not
+commit its data folder to Git, and report a lost assigned drive. Content sent to
+a cloud AI service is also subject to that service's privacy terms.
+
+Do not rename the checkout folder casually: its name determines the neighboring
+data-folder name. If a rename is detected, the launcher asks whether to reuse
+the old data rather than choosing silently.
 
 ## Everyday commands
 
 | Action | Command |
 |---|---|
 | Start | **Start North Forge** or `north-forge.cmd` |
-| Front door | `/menu` |
-| This documentation set | `/readme` or `/readme north-forge-agent` |
-| Kyocera edition docs | `/readme kyocera` |
-| New conversation | `/new` |
-| Engine health | `hermes doctor` |
+| Show the in-session menu | `/menu` |
+| Open this documentation set | `/readme` or `/readme north-forge-agent` |
+| Open private Kyocera docs (when installed) | `/readme kyocera` |
+| Start a clean conversation | `/new` |
+| Select or repair the AI provider | `hermes model` |
+| Run the full setup wizard | `hermes setup` |
+| Check engine health | `hermes doctor` |
+| Show the prepared-drive edition | `scripts\nf-setup.ps1 -Show` |
 
-Engine reference (gateway, tools, providers): [hermes-agent.nousresearch.com/docs](https://hermes-agent.nousresearch.com/docs/)
+Command help text: **“Type `/menu` to see chat actions. Run `hermes --help` in
+PowerShell to see administrator commands.”**
 
-OEM template for another manufacturer: [editions/OEM.md](editions/OEM.md)
+## Troubleshooting and logs
 
----
+| What you see | What to do |
+|---|---|
+| Windows says `git` is not recognized | Install [Git for Windows](https://git-scm.com/download/win), reopen PowerShell, and retry. |
+| Setup cannot download packages | Check the internet connection and company proxy, then run `.\north-forge.cmd` again. |
+| The assistant opens but cannot answer | Run `hermes model` and confirm the selected provider and sign-in details. |
+| Automatic repair fails | Open the neighboring `north-forge-agent-launcher.log`; it records the failed readiness check. |
+| A conversation or setting appears missing after a folder rename | Restart with `north-forge.cmd` and choose **R** to reuse the detected data folder. Do not delete either folder. |
+
+The portable data folder is normally named `north-forge-agent-data`. Runtime
+logs are under `north-forge-agent-data\logs\`; the early launcher log is beside
+the checkout. When asking for help, remove passwords, access keys, and customer
+information before sharing a log.
+
+## Repository map
+
+| Path | Purpose |
+|---|---|
+| [`north-forge.cmd`](north-forge.cmd) | Windows entry point and portable-data setup |
+| [`agent/`](agent/) | Conversation loop, prompts, memory, and provider handling |
+| [`tools/`](tools/) | File, terminal, browser, and other agent capabilities |
+| [`gateway/`](gateway/) | Telegram, Discord, Slack, and other messaging connections |
+| [`apps/desktop/`](apps/desktop/) | Electron desktop application |
+| [`ui-tui/`](ui-tui/) | Terminal user interface |
+| [`skills/`](skills/) | Built-in instruction packs |
+| [`editions/`](editions/) | Public edition structure and OEM template |
+| [`website/`](website/) | Full Hermes engine documentation source |
+
+Developers should read [CONTRIBUTING.md](CONTRIBUTING.md) and the nearest
+`AGENTS.md` before editing an area. Use `scripts/run_tests.sh` rather than calling
+`pytest` directly.
+
+## Documentation
+
+- [Documentation map](DOCS.md)
+- [Why North Forge exists](START_HERE.md)
+- [Current capabilities and limits](CAPABILITIES.md)
+- [Learning and memory](LEARNING.md)
+- [Hermes engine reference](https://hermes-agent.nousresearch.com/docs/)
+- [Issues for this fork](https://github.com/kwalker7631/north-forge-agent/issues)
 
 ## Thanks
 
-Runtime by [Hermes Agent](https://github.com/NousResearch/hermes-agent) / Nous Research and contributors (MIT). Listed last on purpose.
-
-Issues for this fork: [kwalker7631/north-forge-agent](https://github.com/kwalker7631/north-forge-agent/issues)  
-Engine issues: the upstream Hermes project.
+North Forge uses [Hermes Agent](https://github.com/NousResearch/hermes-agent)
+by Nous Research and its contributors under the MIT license. Engine problems
+that are not specific to this fork belong in the upstream Hermes project.

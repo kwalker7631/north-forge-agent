@@ -8,6 +8,16 @@ Heading format: `## [NF-vX.Y.Z] — YYYY-MM-DD — hermes@<sha> (N behind upstre
 
 ---
 
+## [NF-v0.11.1] — 2026-09-11 — hermes@8d79c2ff57 (217 behind upstream/main)
+
+**`RUN-2026-09-11-001` (continued) — private-edition provisioning, tested for real end-to-end.** PATCH — docs only, no code change. Ran the actual admin path, not just the internal `_stage_source` check from `CHG-2026-09-11-001`: real `scripts\bootstrap-north-forge.ps1` (fresh venv+data siblings), then real `scripts\nf-setup.ps1 -Tier full -Pin kyocera -Installed kyocera` against the populated `private-editions\kyocera\` — the `private-editions/<name>/` fallback fired correctly ("installing 'kyocera' from private-editions\kyocera"), `provisioning.json` written and signed, `hermes profile list` / `python -m hermes_cli.nf_tier show` both correct, and a rendered `/edition` (`_exec_edition`) call confirmed the exact chat-visible output lists `kyocera [pinned default]`. A one-shot `hermes -z` prompt reached the expected "no inference provider configured" stop (no API key in this scratch run) — confirms profile resolution completes before model dispatch, nothing edition-specific broke it.
+
+**`CHG-2026-09-11-002`** — `docs/BUILDING-A-DRIVE.md`: new "Pinning to a private edition (e.g. Kyocera)" subsection under Step 2, with the exact tested command sequence (clone into `private-editions/<name>/`, bootstrap, `nf-setup.ps1`, launch, verify).
+
+Verification artifacts (venv, data dir, drive-root shortcut, and the test provisioning record/passcode created for this check) were deleted afterward - this was a real-run verification, not a fixture left in place. `private-editions/kyocera/` itself was left in place (real content, not a leftover).
+
+Run: `RUN-2026-09-11-001`
+
 ## [NF-v0.11.0] — 2026-09-11 — hermes@8d79c2ff57 (217 behind upstream/main)
 
 **`RUN-2026-09-11-001` — `private-editions/` discovery path for named vertical skill-sets (e.g. Kyocera).** MINOR — new capability, no access-tier enforcement change. Kenneth's instruction: a named vertical skill-set is real proprietary content (not a persona overlay), so it never belongs in the public `editions/` tree — it lives in its own private repo, structured the same way (`distribution.yaml` + `SOUL.md` + `skills/`), and gets git-cloned directly into a sibling `private-editions/<name>/` at the repo root.

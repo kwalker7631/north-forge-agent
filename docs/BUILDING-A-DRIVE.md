@@ -60,6 +60,41 @@ with no provisioning record behaves like plain Hermes (un-provisioned = inert).
 **The bundled toolchain and the venv build never touch this record** — see
 "Interaction with tier/pin" below.
 
+### Pinning to a private edition (e.g. Kyocera)
+
+A named vertical skill-set is real proprietary content, not a public overlay,
+so it isn't in `editions/` — it's a separate private repo, cloned directly
+into a gitignored `private-editions/<name>/` slot (see `editions/README.md`,
+"Private editions"). Tested end-to-end (2026-09-11) on a real bootstrap +
+provisioning run, not just read from code:
+
+```powershell
+cd <drive>:\north-forge-agent
+
+# 1. Clone the private edition's repo into the gitignored slot (your own
+#    GitHub credentials gate this - nothing else needed):
+git clone https://github.com/kwalker7631/north-forge-hermes-edition.git private-editions\kyocera
+
+# 2. First launch bootstraps the venv/data if this drive hasn't run yet:
+north-forge.cmd
+#   (or directly:  powershell -ExecutionPolicy Bypass -File scripts\bootstrap-north-forge.ps1)
+
+# 3. Provision - installs 'kyocera' FROM private-editions\kyocera\ (the
+#    editions\<name>\ fallback checks private-editions\<name>\ automatically
+#    when the public folder has no distribution.yaml) and records the pin:
+powershell -ExecutionPolicy Bypass -File scripts\nf-setup.ps1 -NonInteractive -SetPasscode -Passcode "<pick one>" -Tier full -Pin kyocera -Installed kyocera
+
+# 4. Launch - Full tier lands on the pinned edition by default; the switcher
+#    (hermes profile use <name>, or /edition in chat) stays open:
+north-forge.cmd
+```
+
+Verify it took: `hermes profile list` shows `kyocera@<version>` with `◆` if
+it's the active profile; `python -m hermes_cli.nf_tier show` (from the venv)
+reports `pinned edition: kyocera`. A Basic-tier drive instead uses
+`-Tier basic -Pin kyocera` (no `-Installed` needed — the pin is the only
+reachable edition either way).
+
 ## Step 3 — stage the bundled toolchain (one-time master prep, then copy per drive)
 
 `bootstrap-north-forge.ps1` builds the venv from a toolchain it resolves in this

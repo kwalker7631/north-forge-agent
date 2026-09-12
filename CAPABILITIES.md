@@ -1,65 +1,60 @@
 # What North Forge can actually do
 
-The front door is [START_HERE.md](START_HERE.md). This page is the inventory.
+This is the inventory. The front door is [README.md](README.md).
+The reason is [START_HERE.md](START_HERE.md).
 
-Three years of TSC work went into the pack. The hard part of the docs is not
-listing buttons. It is saying the assistant is supposed to **know when it
-does not know**.
+Three years of desk work went into the pack. The hard sentence is not a
+list of buttons. It is this: **the assistant is supposed to know when it
+does not know.**
 
-Manufacturer procedures (Kyocera now; Sharp / Ricoh / Xerox later) live in a
-private edition, not in this public repo.
+## On a live call
 
-## The job
+- Walk the messy middle: electro-mechanical device, host PC, network,
+  PaperCut, MyQ, and the other document tools the edition has been taught.
+- Give the next exact step when a procedure exists.
+- Stop and name the gap when it does not. Ask for the page. Keep the
+  answer once a human supplies it.
+- Speak like a senior, not a product blog. No essay when you asked for
+  a code.
 
-Sit next to a tech. Cover the messy middle of a call:
-
-- Electro-mechanical devices (print / scan / finish / paper path / supplies)
-- The PC and network the device is on (Windows, macOS, Linux)
-- Field stacks the edition has been taught, including **PaperCut** and **MyQ**
-- Other document-management and fleet tools in that pack
-
-When there is a procedure, give the next exact step.  
-When there is not, **stop**, name the gap, ask for the page or the fact.
-Do not invent a part number. After someone supplies the research, keep it.
+Windows, macOS, and Linux hosts are in scope for the **device's world**.
+The one-click teammate drive is Windows first.
 
 ## In the box today
 
 | Layer | Now |
 |---|---|
-| Pocket path | USB / SSD, 8 GB or larger, double-click Start North Forge |
-| Public overlays | Field-service voice, Pocket Penny, Pine Barron Farms |
+| Pocket path | USB / SSD, 8 GB or larger, **Start North Forge** |
+| Honesty | Fact / sourced / inferred / unknown. No confident fiction |
+| Voice | Desk senior. Humanizer means fewer manners, more work |
 | Private edition | Intake, ticket, KB draft, escalation, fault log, training |
-| Honesty | Fact / sourced / inferred / unknown. No confident fiction. |
-| Voice | Senior on the desk. No “Great question.” |
-| Hands | Typed session today. Messaging gateway optional. |
+| Public overlays | Field-service voice, Pocket Penny, Pine Barron Farms |
+| Memory | Drive-local conversations, corrections, logs |
+| Background | Cron research on an always-on admin PC — public sources only |
+| Hands | Typed session today. Messaging gateway optional |
+| Deploy | Admin console builds a labeled drive (`GREGW-NORTH`) |
 
-Built-in *engine* tasks (files, terminal, browser, memory, schedule) are
-there so the pack can work. The teammate does not need their names.
+Built-in engine tasks (files, terminal, browser, schedule) are there so
+the pack can work. The teammate does not need their names.
 
 ## Not yet — do not demo as shipped
 
-- Not a magic lie detector. It is a working rule about holes.
-- Not a full graphical console for the tech (admin Deploy Console only).
-- Not a database product yet.
-- Graph / slides / video / picture tools in the TSC loop are planned.
-- Offline only with a **local** model on the stick. Cloud needs a network.
-
-## Portable and Docker
-
-Windows teammate path first. macOS / Linux can run the same checkout; the
-one-click stick story is Windows. Docker and remote backends exist for
-admin / lab use, not for the hotline handoff.
+- Not a lie detector. A working rule about holes.
+- Not a full graphical console for the technician.
+- Not a database product.
+- Graph, slides, video, and picture tools in the support loop are planned.
+- Offline only after an administrator installs a **local** model.
+- Direct print from the agent to a TASKalfa is not in this build.
 
 ## Roadmap
 
 1. Database-backed KB / asset / ticket memory
 2. A real window for techs who will not use a terminal
-3. Graph, presentation, video, and image tools in the support loop
+3. Media tools in the support loop
 4. More manufacturer editions
 5. Cleaner offline packs
 
 ## Thanks
 
-The runtime is [Hermes Agent](https://github.com/NousResearch/hermes-agent)
-by Nous Research and contributors (MIT). Thank you. It stays at the bottom
-so the first page is the job, not the vendor list.
+Runtime: [Hermes Agent](https://github.com/NousResearch/hermes-agent)
+(Nous Research, MIT). Last on purpose.

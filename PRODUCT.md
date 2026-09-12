@@ -3,10 +3,12 @@
 This is not Hermes Agent with a new name and a banner.
 
 **Hermes Agent** (Nous Research, MIT) is the *engine*: memory, tools, models, terminal, gateway.  
-**North Forge** is the *product*: a portable technical-support assistant that an administrator can load with real procedures, knowledge-base skills, and industry content — then hand to a tech who never types `git`.
+**North Forge** is the *product*: a portable on-demand expert for technical support. An administrator loads real procedures — devices, PCs, PaperCut, MyKey, the rest of the document stack — and hands a tech a stick that is trained to **name a knowledge gap instead of inventing an answer**.
 
 Anyone can clone this public repo and get a working agent.  
 An administrator can add a **private edition** (Kyocera today; Sharp, Ricoh, Xerox, or any other vertical tomorrow) and ship a stick that actually knows that company's support work.
+
+Read [CAPABILITIES.md](CAPABILITIES.md) for domain, honesty rules, portable/Docker limits, and the roadmap.
 
 ```
 Public engine          = this repository (free to run)
@@ -20,10 +22,12 @@ Teammate experience    = plug in USB → double-click Start North Forge → type
 
 Not a chatbot demo. A working assistant that can:
 
+- Work a call across the device, the workstation (Windows / macOS / Linux), and print-management tools the edition knows
 - Take a hotline / ticket in a fixed order
 - Draft a knowledge-base article to a locked template
 - Build an escalation packet with the evidence that is present
-- Log a fault so the next person is not starting from zero
+- Stop and ask when the procedure or the part number is not in the edition
+- Keep the answer after you supply the missing research
 - Stay inside technician judgment — it does not replace the tech
 
 Those skills are not in the public chassis. They live in the **edition**. The Kyocera edition is the reference implementation. Copy that shape for another manufacturer.

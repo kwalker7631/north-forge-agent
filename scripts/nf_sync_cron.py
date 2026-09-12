@@ -35,11 +35,27 @@ this drive's own cron/model default already is. That last part is what makes
 this behave identically on Basic and Full tier: a Basic drive's default model
 is exactly what a job created here will run on, with no separate code path.
 
+Registering a job is necessary but not sufficient: the cron ticker lives in
+the Hermes gateway process, so a job sits inert until something is actually
+running to fire it. This used to be left as a manual step ("run `hermes
+gateway install` yourself"). It no longer is: whenever at least one skill
+declares a cron job, this script also calls `hermes_cli.gateway
+.ensure_gateway_service()` — the same zero-prompt, never-raising install path
+`hermes setup`/`hermes import` already use internally. It short-circuits True
+if a gateway is already running, installs a user-scope systemd/launchd/
+Windows-Scheduled-Task service and starts it when nothing is installed yet,
+and just starts an already-installed-but-stopped one. It no-ops safely (with
+its own explanatory message) inside containers and on hosts with no service
+manager at all, where a restart policy or `hermes gateway run` is the right
+answer instead of a background service — so this script never fights either
+of those cases.
+
 Meant to be cheap, idempotent, and non-fatal: called from north-forge.cmd's
 self-healing block on every launch, and once at the end of nf-setup.ps1 right
-after provisioning, so a fresh Basic-tier drive has its jobs registered
-before anyone opens an interactive session at all. A failure here must never
-block a launch — print a warning (mirroring the old launcher's on-screen
+after provisioning, so a fresh Basic-tier drive has its jobs registered — and
+a gateway installed and running to fire them — before anyone opens an
+interactive session at all. A failure at any step here must never block a
+launch — print a warning (mirroring the old launcher's on-screen
 CRON_DEGRADED behavior) and move on.
 """
 from __future__ import annotations
@@ -140,8 +156,11 @@ def sync(cronjob_fn=None, skills_dir: "Path | None" = None) -> Dict[str, Any]:
         from tools.skills_hub import SKILLS_DIR
         skills_dir = Path(SKILLS_DIR)
 
-    result: Dict[str, Any] = {"created": [], "skipped": [], "failed": [], "gateway_warning": None}
+    result: Dict[str, Any] = {
+        "created": [], "skipped": [], "failed": [], "gateway_warning": None, "declared_count": 0,
+    }
     declared_jobs = discover_cron_jobs(skills_dir)
+    result["declared_count"] = len(declared_jobs)
     if not declared_jobs:
         return result
 
@@ -178,6 +197,37 @@ def sync(cronjob_fn=None, skills_dir: "Path | None" = None) -> Dict[str, Any]:
     return result
 
 
+def ensure_gateway(ensure_fn=None) -> Dict[str, Any]:
+    """Best-effort install+start of the Hermes gateway service, so cron jobs
+    that are already registered actually fire unattended instead of sitting
+    inert until someone remembers to run `hermes gateway install` by hand.
+
+    `ensure_fn` is injectable for tests; production callers leave it None and
+    get the real `hermes_cli.gateway.ensure_gateway_service` (imported here,
+    not at module load, since that module pulls in the full gateway/CLI
+    dependency stack — same lazy-import convention `sync()` uses above).
+
+    Never raises — `ensure_gateway_service` itself already never raises or
+    prompts (it's the same zero-prompt path `hermes setup`/`hermes import`
+    use), but a failed import of its dependency chain, or a test double that
+    misbehaves, is still caught here rather than allowed to propagate.
+    Returns {"attempted": bool, "running": bool, "error": str | None}.
+    """
+    result: Dict[str, Any] = {"attempted": False, "running": False, "error": None}
+    if ensure_fn is None:
+        try:
+            from hermes_cli.gateway import ensure_gateway_service as ensure_fn
+        except Exception as exc:  # noqa: BLE001 - optional dependency chain, never fatal
+            result["error"] = f"could not load the gateway module: {exc}"
+            return result
+    result["attempted"] = True
+    try:
+        result["running"] = bool(ensure_fn(context="nf-sync-cron"))
+    except Exception as exc:  # noqa: BLE001 - belt-and-suspenders; see docstring above
+        result["error"] = str(exc)
+    return result
+
+
 def main() -> int:
     """CLI entry point for north-forge.cmd / nf-setup.ps1. Always exits 0 —
     a cron-sync problem degrades a feature, it must never fail a launch or a
@@ -197,8 +247,22 @@ def main() -> int:
               f"until this is resolved:")
         for failure in result["failed"]:
             print(f"[nf-sync-cron]   - {failure['job']}: {failure['error']}")
-    if result["gateway_warning"]:
-        print(f"[nf-sync-cron] NOTE: {result['gateway_warning']}")
+
+    if result.get("declared_count"):
+        # At least one skill wants cron capability — make sure something is actually
+        # running to fire it, instead of just leaving the old warning on-screen.
+        try:
+            gw = ensure_gateway()
+        except Exception as exc:  # noqa: BLE001 - absolute last resort, see docstring above
+            gw = {"attempted": False, "running": False, "error": str(exc)}
+        if gw["running"]:
+            print("[nf-sync-cron] gateway service confirmed running — scheduled jobs will fire unattended.")
+        else:
+            reason = gw["error"] or result["gateway_warning"] or "the gateway service is not running yet"
+            print(f"[nf-sync-cron] NOTE: {reason}")
+            if gw["attempted"]:
+                print("[nf-sync-cron]   Automatic install/start did not complete this run — "
+                      "retry manually with: hermes gateway install")
     return 0
 
 

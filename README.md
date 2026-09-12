@@ -129,7 +129,12 @@ checkout.
 - Declarative cron sync (`scripts/nf_sync_cron.py`): any installed skill that
   declares a `cron:` block in its own `SKILL.md` gets that job registered
   automatically on every launch and right after provisioning — no manual
-  `/cron add`, no model/provider pin, so it runs the same on Basic and Full tier
+  `/cron add`, no model/provider pin, so it runs the same on Basic and Full tier.
+  The same pass also installs and starts the Hermes gateway service itself
+  (the process that actually fires a scheduled job) the first time any skill
+  needs one, using the same zero-prompt path `hermes setup` already relies on
+  — so a scheduled job is live end to end without anyone running `hermes
+  gateway install` by hand.
 - Generic North Forge support voice and public example overlays
 
 ## What is not included

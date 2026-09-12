@@ -192,3 +192,104 @@ def test_main_never_raises_even_when_sync_blows_up(monkeypatch, capsys):
 
     assert exit_code == 0
     assert "WARNING" in capsys.readouterr().out
+
+
+class TestEnsureGateway:
+    """nf_sync_cron.ensure_gateway() — the auto-install step layered on top of
+    hermes_cli.gateway.ensure_gateway_service(), the same zero-prompt path
+    `hermes setup`/`hermes import` already use."""
+
+    def test_already_running_short_circuits_true(self):
+        result = nf_sync_cron.ensure_gateway(ensure_fn=lambda context: True)
+
+        assert result == {"attempted": True, "running": True, "error": None}
+
+    def test_installs_and_reports_not_yet_running(self):
+        result = nf_sync_cron.ensure_gateway(ensure_fn=lambda context: False)
+
+        assert result == {"attempted": True, "running": False, "error": None}
+
+    def test_passes_a_context_string_through(self):
+        seen = {}
+
+        def fake(context):
+            seen["context"] = context
+            return True
+
+        nf_sync_cron.ensure_gateway(ensure_fn=fake)
+
+        assert seen["context"] == "nf-sync-cron"
+
+    def test_never_raises_when_ensure_fn_blows_up(self):
+        def boom(context):
+            raise RuntimeError("dbus fell over")
+
+        result = nf_sync_cron.ensure_gateway(ensure_fn=boom)
+
+        assert result["attempted"] is True
+        assert result["running"] is False
+        assert "dbus fell over" in result["error"]
+
+    def test_never_raises_when_the_gateway_module_cannot_be_imported(self, monkeypatch):
+        import builtins
+
+        real_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "hermes_cli.gateway":
+                raise ImportError("no module named hermes_cli.gateway")
+            return real_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+
+        result = nf_sync_cron.ensure_gateway()
+
+        assert result["attempted"] is False
+        assert result["running"] is False
+        assert "hermes_cli.gateway" in result["error"] or "gateway module" in result["error"]
+
+
+def test_main_auto_installs_gateway_when_jobs_are_declared(monkeypatch, capsys):
+    monkeypatch.setattr(nf_sync_cron, "sync", lambda: {
+        "created": ["nightly-kyocera-research"], "skipped": [], "failed": [],
+        "gateway_warning": "gateway not running", "declared_count": 1,
+    })
+    monkeypatch.setattr(nf_sync_cron, "ensure_gateway", lambda: {
+        "attempted": True, "running": True, "error": None,
+    })
+
+    exit_code = nf_sync_cron.main()
+    out = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "confirmed running" in out
+
+
+def test_main_skips_gateway_ensure_when_no_skill_declares_cron(monkeypatch, capsys):
+    monkeypatch.setattr(nf_sync_cron, "sync", lambda: {
+        "created": [], "skipped": [], "failed": [], "gateway_warning": None, "declared_count": 0,
+    })
+    called = []
+    monkeypatch.setattr(nf_sync_cron, "ensure_gateway", lambda: called.append(True))
+
+    exit_code = nf_sync_cron.main()
+
+    assert exit_code == 0
+    assert not called
+
+
+def test_main_reports_manual_fallback_when_auto_install_does_not_complete(monkeypatch, capsys):
+    monkeypatch.setattr(nf_sync_cron, "sync", lambda: {
+        "created": ["nightly-kyocera-research"], "skipped": [], "failed": [],
+        "gateway_warning": None, "declared_count": 1,
+    })
+    monkeypatch.setattr(nf_sync_cron, "ensure_gateway", lambda: {
+        "attempted": True, "running": False, "error": "no service manager found",
+    })
+
+    exit_code = nf_sync_cron.main()
+    out = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "no service manager found" in out
+    assert "hermes gateway install" in out

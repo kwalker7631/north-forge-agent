@@ -23,6 +23,62 @@ _None._
 
 ## Resolved
 
+### DECISION-2026-09-11-001 — Repo safety — how to stop GitHub fork-sync from silently discarding fork history a third time?
+
+- **Opened:** 2026-09-11 · **Base:** hermes@8d79c2ff57 (228 behind upstream/main)
+- **Run:** RUN-2026-09-11-002 (opened + decided + implemented same run — owner
+  posed the exact options in the task prompt and picked between them via a direct
+  question)
+- **Source:** ERR-2026-09-11-001 (GitHub fork-sync force-reset `origin/main` to
+  upstream, discarding 186 fork commits — 2nd occurrence, `main` had zero branch
+  protection).
+- **Confidence:** Confirmed Fact — `gh api .../branches/main/protection` showed
+  404 (no protection) before this decision, and the exact response fields
+  (`allow_force_pushes`, `allow_fork_syncing`, `enforce_admins`) after.
+- **Supersedes:** — none.
+- **The call:** the fault is a **branch-level ref replacement** done outside git's
+  merge logic (GitHub's "Sync fork" / `merge-upstream`, gated by its own
+  `allow_fork_syncing` permission), not a per-file merge conflict. Two candidate
+  safeguard shapes were on the table, aimed at different layers:
+- **Options:**
+  - **A — file-level: exclude `README.md`/`BRANDING.md`/`SOUL.md` from automatic
+    merge conflict resolution** (custom merge driver / `.gitattributes`), forcing
+    manual review whenever upstream touches them. Rejected as insufficient on its
+    own: the actual incident was never a merge conflict — a branch reset replaces
+    the whole tree in one ref update, so a merge-driver hook never runs and
+    would not have fired.
+  - **B — post-sync content check**, verifying North-Forge-identifying strings
+    survive after any upstream sync, failing loudly if not. Real value as
+    **detection**, but on its own is after-the-fact — it would catch the next
+    reset within a day (scheduled) or at the next push/PR, not prevent it, and a
+    reset that also wipes the workflow file that runs the check defeats it
+    (though the CI run history itself would still show a gap, which is a
+    detectable signal on review).
+  - **C — GitHub branch protection on `main`** (`allow_force_pushes: false`,
+    `allow_deletions: false`, `enforce_admins: true`, and specifically
+    `allow_fork_syncing: false`) **(chosen, combined with B)**. This is the
+    structural fix: it blocks the actual mechanism (any non-fast-forward ref
+    update to `main`, including the fork-sync discard path) at the point it
+    would occur, applies even to the repo owner (`enforce_admins`), and doesn't
+    depend on a workflow file surviving the incident to be effective.
+- **Decided:** 2026-09-11 (`RUN-2026-09-11-002`) — chose **C + B**: branch
+  protection as the preventive gate (closes the actual hole — `allow_fork_syncing`
+  is the GitHub-native permission for this exact feature), `nf-branding-guard.yml`
+  as the detection layer underneath in case the gate is ever loosened or a
+  different mechanism causes the same symptom. **A was not pursued** — the
+  normal `git merge upstream/main` sync path was independently confirmed clean
+  (a `git merge-tree` simulation against `upstream/main` on the last-good commit
+  produced no conflict and preserved branding), so there is no per-file merge
+  risk to guard against; adding a merge driver would be defense against a
+  failure mode that doesn't reproduce. Implementing changes: **CHG-2026-09-11-003**
+  (branch protection, applied via `gh api` — not a tracked-file change),
+  **CHG-2026-09-11-004** (`.github/workflows/nf-branding-guard.yml`).
+- **Blocking:** nothing — `main` remains fully usable for normal work (direct
+  pushes from an authorized push are unaffected; only force-pushes, deletions,
+  and fork-sync resets are blocked).
+- **Owner:** Kenneth C. Walker Jr.
+- **Status:** DECIDED
+
 ### DECISION-2026-09-10-001 — Access architecture — how does a Full-tier operator re-open Setup Run from inside a running session?
 
 - **Opened:** 2026-09-10 · **Base:** hermes@0e9fc2cc15 (0 behind upstream/main)
@@ -432,3 +488,4 @@ _None._
 | DECISION-2026-09-07-002 | 2026-09-07 | Branding wording | "engine used unmodified" / "full rebrand" broader than the code (Codex F-07) | **DECIDED** — A (tighten wording), `RUN-2026-09-08-004` / `CHG-2026-09-08-010`+`-011`. README ×2 + 3 translations + BRANDING ×2 reworded; `cli.py` welcome + `_parser.py` chat description moved to North Forge; BRANDING names the deliberately-Hermes surfaces | 2026-09-08 |
 | DECISION-2026-09-09-001 | 2026-09-09 | Drive provisioning | Bundle a Python toolchain on the drive, and how? | **DECIDED** — B (bundle `uv.exe` + a `python-build-standalone` CPython 3.11 as a never-git-tracked drive sibling `<parent>\<leaf>-toolchain\`, admin-prepared once and copied per drive — not fetched at first-launch, not git/LFS). `RUN-2026-09-09-002` / `CHG-2026-09-09-003` (`NF-v0.9.0`). Resolution order: bundled → host PATH (admin/dev, logged) → existing error. No change to R1 | 2026-09-09 |
 | DECISION-2026-09-10-001 | 2026-09-10 | Access architecture | How does a Full-tier operator re-open Setup Run from inside a running session? | **DECIDED** — A (in-session admin-passcode trigger → `nf-setup.ps1 -Force` after teardown, then re-exec; Full-tier + passcode-set + exact-match only, silent and inert on every other input, recognised attempts logged for the owner without the passcode). `RUN-2026-09-10-001` / `CHG-2026-09-10-001` (`NF-v0.10.0`). Owner-directed. Grants no reachable capability a Full operator lacks; no enforcement path changed. Builds on `DECISION-2026-09-07-003` | 2026-09-10 |
+| DECISION-2026-09-11-001 | 2026-09-11 | Repo safety | How to stop GitHub fork-sync from silently discarding fork history a third time? | **DECIDED** — C+B (GitHub branch protection on `main`: `allow_force_pushes:false`, `allow_fork_syncing:false`, `enforce_admins:true` — the structural fix — plus `nf-branding-guard.yml` CI content check as detection). A (exclude branding files from merge conflict resolution) not pursued — the fault was a branch-level reset, not a merge conflict; the normal `git merge upstream/main` path was independently confirmed clean. `RUN-2026-09-11-002` / `CHG-2026-09-11-003`+`-004`. Resolves ERR-2026-09-11-001 | 2026-09-11 |

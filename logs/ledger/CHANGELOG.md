@@ -8,6 +8,18 @@ Heading format: `## [NF-vX.Y.Z] — YYYY-MM-DD — hermes@<sha> (N behind upstre
 
 ---
 
+## [NF-v0.11.2] — 2026-09-11 — hermes@8d79c2ff57 (228 behind upstream/main)
+
+**`RUN-2026-09-11-002` — ERR-2026-09-11-001: `origin/main` force-reset to upstream by GitHub fork-sync, wiping all 186 fork commits (2nd occurrence).** PATCH — incident response + repo-config hardening, no application code change. Owner reported README.md "reverted to Hermes-forward content again" and asked for the actual mechanism, not a blind re-patch. Traced it past the file diff: `README.md`'s own history never reverted (every `Merge branch 'NousResearch:main' into main` kept branding; a `git merge-tree` simulation of the next upstream sync confirmed a clean, non-conflicting merge). `git fetch origin main` reported a forced update — `origin/main`'s tip had been reset to an upstream `NousResearch/hermes-agent` commit wholesale (confirmed via `merge-base --is-ancestor`), taking every one of the 186 fork-only commits with it (branding, `SOUL.md`, `BRANDING.md`, the ledger, the CLI skin, the installer — not just `README.md`). This is GitHub's fork-sync "Discard commits" / `merge-upstream` mechanism, gated by its own `allow_fork_syncing` permission — a branch-level ref replacement, not a per-file merge, so no `.gitattributes` merge strategy could ever have caught it. `main` had zero branch protection. Full detail: ERR-2026-09-11-001; safeguard rationale: DECISION-2026-09-11-001.
+
+**`CHG-2026-09-11-003`** — GitHub branch protection enabled on `main` via `gh api` (not a tracked-file change): `allow_force_pushes: false`, `allow_deletions: false`, `enforce_admins: true`, and — the specific fix — `allow_fork_syncing: false`. Blocks the actual mechanism (any non-fast-forward ref update to `main`, fork-sync included) even for the repo owner.
+
+**`CHG-2026-09-11-004`** — `.github/workflows/nf-branding-guard.yml`: new CI workflow (push/PR to `main`, daily schedule, `workflow_dispatch`) that greps `README.md`, `SOUL.md`, `BRANDING.md` for the category-1 identity markers from `BRANDING.md` §1 and fails loudly if any are missing — detection layer underneath the branch-protection gate.
+
+Recovery: force-pushed local `main` (`63e3209593`, which retained all 186 commits — the local clone predates the reset) back onto `origin/main`; verified via `gh api repos/kwalker7631/north-forge-agent/contents/README.md` blob SHA match post-push (`e686ca5032…`, matching `CHG-2026-09-10-002`'s branding fix). No new `CHG-` for the recovery itself — it restored previously-recorded content, introduced nothing new.
+
+Run: `RUN-2026-09-11-002`
+
 ## [NF-v0.11.1] — 2026-09-11 — hermes@8d79c2ff57 (217 behind upstream/main)
 
 **`RUN-2026-09-11-001` (continued) — private-edition provisioning, tested for real end-to-end.** PATCH — docs only, no code change. Ran the actual admin path, not just the internal `_stage_source` check from `CHG-2026-09-11-001`: real `scripts\bootstrap-north-forge.ps1` (fresh venv+data siblings), then real `scripts\nf-setup.ps1 -Tier full -Pin kyocera -Installed kyocera` against the populated `private-editions\kyocera\` — the `private-editions/<name>/` fallback fired correctly ("installing 'kyocera' from private-editions\kyocera"), `provisioning.json` written and signed, `hermes profile list` / `python -m hermes_cli.nf_tier show` both correct, and a rendered `/edition` (`_exec_edition`) call confirmed the exact chat-visible output lists `kyocera [pinned default]`. A one-shot `hermes -z` prompt reached the expected "no inference provider configured" stop (no API key in this scratch run) — confirms profile resolution completes before model dispatch, nothing edition-specific broke it.

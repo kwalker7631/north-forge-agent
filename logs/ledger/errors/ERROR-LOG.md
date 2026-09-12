@@ -803,6 +803,63 @@ in [`README.md`](../README.md). Severity: **CRITICAL** · **HIGH** · **MEDIUM**
   variant are unaffected (no `.sh` bootstrap exists); if one is added it needs the
   same `UV_CACHE_DIR` line.
 
+### ERR-2026-09-11-001 — CRITICAL — `origin/main` force-reset to upstream by fork-sync (2nd occurrence), wiping all 186 fork commits
+
+- **Opened:** 2026-09-11 · **Base:** hermes@8d79c2ff57 (228 behind upstream/main)
+- **Run:** RUN-2026-09-11-002
+- **Source:** Owner report — "README.md on north-forge-agent has reverted to
+  Hermes-forward content again - the second time this has happened" — requesting
+  root cause, not a blind re-patch.
+- **What:** `README.md`'s own commit history never actually reverted — every
+  `Merge branch 'NousResearch:main' into main` commit kept North Forge branding,
+  and a clean `git merge-tree` simulation of the next upstream sync on top of the
+  last good commit (`9998dd8028`, `CHG-2026-09-10-002`) produced no conflict and
+  no drift. The regression was not in any commit reachable from the local clone.
+  `git fetch origin main` reported a **forced update**
+  (`63e3209593...1021a03256`); the new `origin/main` tip (`1021a03256`, "chore:
+  map contributor email for jakobdylanc") is **byte-identical to an upstream
+  `NousResearch/hermes-agent` commit** (`git merge-base --is-ancestor` confirms
+  it's an ancestor of `upstream/main`). `gh api repos/kwalker7631/north-forge-agent`
+  confirms `fork: true`, `parent: NousResearch/hermes-agent` — a genuine GitHub
+  fork relationship, which exposes the "Sync fork" → "Discard commits" action
+  (and its API equivalent, `POST .../merge-upstream`) alongside the normal
+  fast-forward sync. That action does a **branch-level ref replacement**, not a
+  per-file merge, so it bypasses git's merge logic (and any `.gitattributes`
+  merge strategy or file-level exclusion) entirely. `gh api
+  .../branches/main/protection` returned 404 — **`main` had zero branch
+  protection** — nothing gated the reset. Diffing the old fork tip against the
+  new upstream-only tip: **186 commits, 728 files, +19276/-30843 lines** —
+  every `NF-v*` commit gone, not only `README.md`'s branding (`SOUL.md`,
+  `BRANDING.md`, `logs/ledger/**`, the CLI skin, the installer, all of it).
+  `[[north-forge-agent-ledger]]` already recorded one prior "a GitHub 'sync
+  fork' merged upstream mid-pass" event (`RUN-2026-09-07-001`) — that one
+  happened to fast-forward cleanly with no fork-only commits lost at the time;
+  this is the same mechanism landing destructively now that the fork carries
+  real history.
+- **Confidence:** Confirmed Fact — blob SHAs, `merge-base --is-ancestor`, the
+  `gh api` fork/protection responses, and the forced-update message were all
+  captured directly this run, not inferred.
+- **Exposure / impact:** total — the public `origin/main` briefly presented as
+  stock Hermes Agent with zero North Forge identity, and every fork-only commit
+  (186) was unreachable from `origin/main` until recovered. Local `main`
+  retained full history throughout (the local clone predates the reset), so
+  nothing was unrecoverable.
+- **Resolved:** 2026-09-11 — owner authorized (a) force-pushing local `main`
+  (`63e3209593`, contains all 186 commits incl. `CHG-2026-09-10-002`) back onto
+  `origin/main`, verified via `gh api .../contents/README.md` blob SHA match
+  post-push; (b) branch protection on `main`
+  (`allow_force_pushes: false`, `allow_deletions: false`, `enforce_admins: true`,
+  and — confirmed by the protection API response itself —
+  **`allow_fork_syncing: false`**, the exact GitHub-native gate for this
+  mechanism); (c) a CI detection layer, `.github/workflows/nf-branding-guard.yml`
+  (push/PR to `main` + daily schedule + `workflow_dispatch`), grep-checking the
+  category-1 identity markers from `BRANDING.md` §1 in `README.md`, `SOUL.md`,
+  `BRANDING.md` — ran green on the push that added it
+  (`gh run list --repo kwalker7631/north-forge-agent --workflow=nf-branding-guard.yml`).
+  Resolving changes: CHG-2026-09-11-003 (branch protection), CHG-2026-09-11-004
+  (`nf-branding-guard.yml`). Decision record: DECISION-2026-09-11-001.
+- **Status:** RESOLVED.
+
 ---
 
 ## Register (quick scan)
@@ -837,3 +894,4 @@ in [`README.md`](../README.md). Severity: **CRITICAL** · **HIGH** · **MEDIUM**
 | ERR-2026-09-09-002 | 2026-09-09 | HIGH | Launcher / bootstrap tooling | `bootstrap-north-forge.ps1` checked `-VenvDir` and `-DataDir` each against the checkout but never against each other → an equal/nested/case-variant pair let a `-Force` rebuild `Remove-Item -Recurse` on `VenvDir` delete `HERMES_HOME` (explicit-override path only; default `north-forge.cmd` unaffected) | RESOLVED | CHG-2026-09-09-001 — new `Test-PathOverlap $VenvDir $DataDir` guard after the existing RepoRoot guards; equal/trailing-sep/case/nested all rejected; `test_reject_venv_equals_or_contains_data` ×4 |
 | ERR-2026-09-09-003 | 2026-09-09 | MEDIUM | `hermes` sessions CLI | `query_session_listing` fetched a fixed `limit*4` window then filtered unnamed/current rows in Python — enough newer unnamed sessions hid an older *named* displayable session that was never fetched (same shape as `ERR-2026-09-08-008`) | RESOLVED | CHG-2026-09-09-002 — `limit<=0` ⇒ `[]` before any query; adaptive widening `limit*(4,8,16)` always from row 0, stop when `limit` displayable rows survive or the DB returns short; filter factored to `_displayable()`; `+5` tests |
 | ERR-2026-09-10-001 | 2026-09-10 | HIGH | Access-tier logic | A `Merge branch 'main' into main` dropped `def _desktop_ssh_backend` from `hermes_cli/main.py` but kept its call in `_apply_profile_override` (`main.py:642`); the module-level call at `main.py:679` makes `import hermes_cli.main` raise `NameError` on an unprovisioned or Full-tier drive. On `origin/main` too. Introduced by a merge after `677e8ed8a4`; not caused by `CHG-2026-09-10-001` (reproduced on the reverted tree) | RESOLVED | CHG-2026-09-10-003 (`RUN-2026-09-10-003`) — `def _desktop_ssh_backend` restored **verbatim** from `677e8ed8a4`, before `_apply_profile_override`. `import hermes_cli.main` OK; covering test survived the merge and passes; `test_nf_admin.py` 17p; `test_nf_tier_enforcement.py` 30p (the 1 prior failure gone). Pushed to `origin/main` |
+| ERR-2026-09-11-001 | 2026-09-11 | CRITICAL | Fork identity / repo config | GitHub fork-sync ("Sync fork" discard / `merge-upstream`) force-reset `origin/main` to an upstream `NousResearch/hermes-agent` commit, wiping all 186 fork-only commits (branding, `SOUL.md`, `BRANDING.md`, ledger, CLI skin, installer) — 2nd occurrence; `main` had zero branch protection | RESOLVED | CHG-2026-09-11-003 (branch protection incl. `allow_fork_syncing: false`) / CHG-2026-09-11-004 (`nf-branding-guard.yml` CI check); recovery = force-push of local `main`; DECISION-2026-09-11-001 |

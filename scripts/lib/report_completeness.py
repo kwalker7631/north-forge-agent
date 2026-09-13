@@ -53,6 +53,14 @@ ROW_RE = re.compile(
 )
 
 LEDGER_ONLY_TOKENS = {"ledger-only", "ledgeronly", "—", "-", "n/a", "none"}
+# A row whose Source-Of-Truth cites "lost" means a report was produced but its
+# sole ("in-bundle") copy was later destroyed by a documented event (e.g. the
+# D: wipe recorded at RUN-2026-09-11-001) - distinct from "ledger-only" (no
+# report was ever produced). Counted as covered, but surfaced as a WARN every
+# run (not a routine OK) so a real, cited loss stays visible rather than
+# silently blending into a clean report. Never auto-applied - see
+# REPORT-MANIFEST.md's own rule that only a row citing a real, checked event
+# may use it.
 
 # The owner's standing rule: every session report ends with a literal closing line
 #   Handoff bundle: HANDOFF_<YYYY-MM-DD_HHMM>.zip (sha256: <64 hex>) - created.
@@ -255,10 +263,13 @@ def main(argv: list[str] | None = None) -> int:
             if source in LEDGER_ONLY_TOKENS or "ledger-only" in source:
                 f.ok(f"{run}: ledger-only (no session report) — {row['source'] or 'declared'}", routine=True)
                 covered += 1
+            elif "lost" in source:
+                f.warn(f"{run}: report confirmed lost, not fabricated — {row['source']}")
+                covered += 1
             else:
                 f.fail(
                     f"{run}: manifest row has no report file and is not marked "
-                    f"ledger-only (source='{row['source']}')"
+                    f"ledger-only or lost (source='{row['source']}')"
                 )
             continue
 

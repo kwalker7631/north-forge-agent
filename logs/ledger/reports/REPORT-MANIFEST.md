@@ -16,6 +16,7 @@ or declares the run `ledger-only` (it legitimately produced no report).
 | a row's `sha256` != the report on disk (report edited) | WARN — refresh the row |
 | a row for a `RUN-` id no ledger entry uses | WARN — stale row |
 | an unresolved `[[wiki-link]]` in the ledger | WARN — confirm it's intentional |
+| a row with no report file, `Source-Of-Truth` citing `lost` | WARN — confirmed unrecoverable, cited, not fabricated |
 
 **Append-only in spirit.** Correct a wrong row by editing it in place (and
 refreshing its `sha256`); never delete a row for a run that still exists in the
@@ -26,7 +27,21 @@ carry their run id in the body, which is what the check verifies. New reports us
 
 `Source-Of-Truth` = `in-bundle` when the `D:\logs\` file *is* the authoritative
 write-up; an absolute path / URL when that file is a redacted mirror of a fuller
-report kept elsewhere; `ledger-only` when the run produced no report.
+report kept elsewhere; `ledger-only` when the run produced no report; `lost —
+<what happened, cited>` when a report *was* produced (source was `in-bundle`,
+its only copy) but that copy was later destroyed by a documented event — never
+write bare `lost`, and never use this to paper over a report that simply wasn't
+written. **All 30 `lost` rows below (`RUN-2026-09-06-001` through
+`RUN-2026-09-11-002`) cite the same event**: `D:\` was wiped and both repos
+re-cloned some time before `RUN-2026-09-12-001` — the wipe itself is recorded
+after the fact at `CHANGELOG.md`'s `RUN-2026-09-11-001` entry ("re-added the
+`upstream` remote (lost when `D:` was wiped and re-cloned)"), and confirmed
+empirically this session (2026-09-12): none of the 30 named report files exist
+anywhere on `D:\`, in `Downloads\`, or inside any `*.zip` on either location
+(handoff bundles included) — checked by filename, not assumed. These reports
+had no other Source-Of-Truth to fall back on precisely because `in-bundle`
+meant `D:\logs\` was the only copy; the wipe took them all in one event, which
+is also why they cluster into one contiguous run rather than being scattered.
 
 To refresh a `sha256` after editing a report:
 `python -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" D:\logs\<file>`
@@ -35,37 +50,38 @@ To refresh a `sha256` after editing a report:
 
 | RUN id | Report file (in `D:\logs\`) | Covers | Source-Of-Truth | sha256 |
 | --- | --- | --- | --- | --- |
-| RUN-2026-09-06-001 | LEDGER_TEMPLATE_UPDATE_2026-09-06.md | ledger-schema v2 setup, CHG-2026-09-06-015..019 | in-bundle | ce407d912baa39ac5513b43aee29fb742abf57630d907c799fdb4ca732c8c236 |
-| RUN-2026-09-06-002 | REBRAND_2026-09-06.md | CHG-2026-09-06-020, CHG-2026-09-06-021, CHG-2026-09-06-022, CHG-2026-09-06-023, CHG-2026-09-06-024, DECISION-2026-09-06-001 | in-bundle | 480f5d20755c4f44a4a1ee8ce93f2f0f644242ff6803bcb74d94ea94f5959ed6 |
-| RUN-2026-09-06-003 | BRANDING_PASS_2026-09-06.md | CHG-2026-09-06-025, CHG-2026-09-06-026 | in-bundle | de1814090505c4923d5b6b1afc2f22cffd474f5c2acd0ade5745c452e9a16404 |
-| RUN-2026-09-07-001 | CONSOLIDATED_PASS_2026-09-07.md | consolidated pass (step 4 → DECISION-2026-09-06-003 opened) | in-bundle | 9352dafea4d9ad3330b89f2ca064518d31658c7620743a154290e1674f8e12bc |
-| RUN-2026-09-07-002 | IDENTITY-RUNTIME_2026-09-07.md | CHG-2026-09-07-007 | in-bundle | 732cd9a7051b83605c1809941cef26d514e4c8fad04d893b769670904776f404 |
-| RUN-2026-09-07-003 | PUSH-SYNC_2026-09-07.md | CHG-2026-09-07-009, CHG-2026-09-07-010, ERR-2026-09-07-002 | in-bundle | 6661f45d60da2dff3dd8466cff46562cb0c97a92b114f9ab175c992009191731 |
-| RUN-2026-09-07-004 | DRIVE-NATIVE-ONBOARDING_2026-09-07.md | CHG-2026-09-07-011, CHG-2026-09-07-012, CHG-2026-09-07-013, CHG-2026-09-07-014, DECISION-2026-09-07-001 | in-bundle | ebfc8b655591de920e61b15ad3509735541d3c310b01f0bf34c343be364a5ebe |
-| RUN-2026-09-07-005 | BOOTSTRAP-F04-DATALOSS-FIX_2026-09-07.md | CHG-2026-09-07-015, ERR-2026-09-07-003 | in-bundle | b6d5ab21168697977a3f8beda98108155cc67fbd5458d34a11d48704b5ab3167 |
-| RUN-2026-09-07-006 | CODEX-AUDIT-CHEAP-FIXES-AND-BACKLOG_2026-09-07.md | CHG-2026-09-07-016, CHG-2026-09-07-017, CHG-2026-09-07-018, ERR-2026-09-07-004, ERR-2026-09-07-006, ERR-2026-09-07-007, DECISION-2026-09-07-002 | in-bundle | c88c57275831a6513fe23d3719bb68893f5d9b09b41d3ac7cb58d194add1b902 |
-| RUN-2026-09-07-007 | CONTENT-SCAN-F03-WHITESPACE-BYPASS_2026-09-07.md | CHG-2026-09-07-019, ERR-2026-09-07-005 | in-bundle | de7820866fb2ae0ec4736a924ad15c06728e9748abbc51f3dac6ae4a8ad00c94 |
-| RUN-2026-09-07-008 | LAUNCHER-READINESS-PROBE_2026-09-07.md | CHG-2026-09-07-020, ERR-2026-09-07-006 | in-bundle | e14f46c2b242f33e5cf124d1033c1f7c2b7283af8462bf2570d484f5f1d7a8f3 |
-| RUN-2026-09-07-009 | SKIN-REBUILD-V2_2026-09-07.md | CHG-2026-09-07-021 | in-bundle | 1af8afb2fd7b36ea88ed0614c604b5e19034cb98bf43a21a268e5772a48ae75d |
-| RUN-2026-09-07-010 | TIER-PIN-MECHANISM_2026-09-07.md | CHG-2026-09-07-022, DECISION-2026-09-07-003 | in-bundle | 99ca88ffe8484aa657884f518b71555e9be5ee986df6f86219e063e0209c0e5e |
-| RUN-2026-09-07-011 | LEDGER-RATIFICATION_2026-09-07.md | CHG-2026-09-07-023, DECISION-2026-09-06-002, DECISION-2026-09-06-003 | in-bundle (backfilled RUN-2026-09-08-004) | c90917d00d9a26565f58a532ef6ee35b19b9e5df431e48b407af930c636cb211 |
-| RUN-2026-09-08-001 | NF-v0.7.0-INSTALLER-GUI-SKIN-DOCS_2026-09-08.md | CHG-2026-09-08-001, CHG-2026-09-08-002, CHG-2026-09-08-003, CHG-2026-09-08-004 | in-bundle (backfilled RUN-2026-09-08-004) | 053e582d956e0100962aa8d7c637bc67e72edfa17bd3a4ffb212c93bc91a3a61 |
-| RUN-2026-09-08-002 | PREVIEW-PAGE-REAL-ART_2026-09-08.md | CHG-2026-09-08-005 | in-bundle (backfilled RUN-2026-09-08-004) | a9a23734aa9639f47a52b8502b85279b83fbf169317f2033e296432e82622974 |
-| RUN-2026-09-08-003 | RECONCILE-PUSH-EDITIONS_2026-09-08.md | CHG-2026-09-08-006, CHG-2026-09-08-007 | in-bundle (backfilled RUN-2026-09-08-004) | 2d366d9aa977eed3679bdd64671d64f4d79e2f7d0aa43f0116d035adc10e7697 |
-| RUN-2026-09-08-004 | HYGIENE-CLEANUP_2026-09-08.md | CHG-2026-09-08-008, CHG-2026-09-08-009, CHG-2026-09-08-010, CHG-2026-09-08-011, CHG-2026-09-08-012, CHG-2026-09-08-013, CHG-2026-09-08-014, CHG-2026-09-08-015, CHG-2026-09-08-016, ERR-2026-09-07-004, ERR-2026-09-07-007, ERR-2026-09-08-001, ERR-2026-09-08-002, ERR-2026-09-08-003, ERR-2026-09-08-004, DECISION-2026-09-07-002 | in-bundle | b41cbf6e3b81f623823f69b51b129f740220937e661e96d1124381a54e3e9064 |
-| RUN-2026-09-08-005 | CONSOLIDATED-COMMIT-PASS_2026-09-08.md | CHG-2026-09-08-017, CHG-2026-09-08-018, CHG-2026-09-08-019, CHG-2026-09-08-020, CHG-2026-09-08-021, CHG-2026-09-08-022, CHG-2026-09-08-023, CHG-2026-09-08-024, CHG-2026-09-08-025, ERR-2026-09-08-005, ERR-2026-09-08-006, ERR-2026-09-08-007, ERR-2026-09-08-008, ERR-2026-09-08-009, ERR-2026-09-08-010, ERR-2026-09-08-011, ERR-2026-09-08-012 | in-bundle | ec80061b431e1581e680ad0821740e19decd597f29b0256822fe9c3a779da96b |
-| RUN-2026-09-09-001 | NF-v0.8.2-R1-AND-SESSION-LISTING_2026-09-09.md | CHG-2026-09-09-001, CHG-2026-09-09-002, ERR-2026-09-09-001, ERR-2026-09-09-002, ERR-2026-09-09-003 | in-bundle | 852ef461170c474afd72b393b979ed0ac19c4790e98d9925edf0d7426753af6c |
-| RUN-2026-09-09-002 | NF-v0.9.0-BUNDLED-TOOLCHAIN_2026-09-09.md | DECISION-2026-09-09-001, CHG-2026-09-09-003 | in-bundle | 696b720f4123fa9a0acbd198187d2833fa81b54db9a823072195df1372e0f0a0 |
-| RUN-2026-09-10-001 | IN-SESSION-ADMIN-TRIGGER_2026-09-10.md | CHG-2026-09-10-001, DECISION-2026-09-10-001, ERR-2026-09-10-001 | in-bundle | 33b76dfb255e9776f57f268b73f685b1818dfe6d82be06adadb4bbe722b289f5 |
-| RUN-2026-09-10-002 | DRIVE-CLEANUP-AND-BRANDING_2026-09-10.md | CHG-2026-09-10-002, ERR-2026-09-10-001 | in-bundle | 69f7eb8ca28e219ba182531bd2b48094a8f81eb26c09a44cce1b67e007473f01 |
-| RUN-2026-09-10-003 | CRASH-FIX-HANDOFF-LINE-AND-PUSH_2026-09-10.md | CHG-2026-09-10-003, CHG-2026-09-10-004, ERR-2026-09-10-001 | in-bundle | 922e6c7733923063223831668d2358958a1b1cce3c914a36b425ca7032c28ba1 |
-| RUN-2026-09-10-004 | PERSONA-CHECK-AND-BACKUP-CLEANUP_2026-09-10.md | — (no CHG/ERR/DECISION; investigation + drive cleanup only) | in-bundle | 9f22ce95f6002e13bed223c945fdd7860e7e71f526808ee356a03ffb82b3759a |
-| RUN-2026-09-10-005 | VERIFY-LAUNCH-GIT-PULL_2026-09-10.md | — (no CHG/ERR/DECISION; investigation only, no changes) | in-bundle | 98379278ac81bf4f7e826047fbf947985a9ef198c0dcaba43c395e5407178e95 |
-| RUN-2026-09-10-006 | LOGGING-PIPELINE-SANITY-CHECK_2026-09-10.md | CHG-2026-09-10-005 | in-bundle | 2f97ec8c4bb764bdbaf4857d6b3f69e226392a9e04a5e7b6931b3112586d034b |
-| RUN-2026-09-10-007 | STUB-HONESTY-AUDIT_2026-09-10.md | — (no CHG/ERR/DECISION; audit found nothing to fix) | in-bundle | d0077207c2e5aa3ee12ffd848019eb8bb411f75d7259726f55086f7960e2a636 |
-| RUN-2026-09-11-001 | PRIVATE-EDITIONS-DISCOVERY_2026-09-11.md | CHG-2026-09-11-001, CHG-2026-09-11-002 | in-bundle | c56088e997fe9ec28cfa1a98a55c27f4a71044b15ca67c828151b090ca8f126c |
-| RUN-2026-09-11-002 | FORK-SYNC-RESET-RECOVERY_2026-09-11.md | CHG-2026-09-11-003, CHG-2026-09-11-004, ERR-2026-09-11-001, DECISION-2026-09-11-001 | in-bundle | d1a5a3db705c1ff68de2fc910822b28077acce67ad05887c304e5868e08aa860 |
+| RUN-2026-09-06-001 | — | ledger-schema v2 setup, CHG-2026-09-06-015..019 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-06-002 | — | CHG-2026-09-06-020, CHG-2026-09-06-021, CHG-2026-09-06-022, CHG-2026-09-06-023, CHG-2026-09-06-024, DECISION-2026-09-06-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-06-003 | — | CHG-2026-09-06-025, CHG-2026-09-06-026 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-001 | — | consolidated pass (step 4 → DECISION-2026-09-06-003 opened) | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-002 | — | CHG-2026-09-07-007 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-003 | — | CHG-2026-09-07-009, CHG-2026-09-07-010, ERR-2026-09-07-002 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-004 | — | CHG-2026-09-07-011, CHG-2026-09-07-012, CHG-2026-09-07-013, CHG-2026-09-07-014, DECISION-2026-09-07-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-005 | — | CHG-2026-09-07-015, ERR-2026-09-07-003 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-006 | — | CHG-2026-09-07-016, CHG-2026-09-07-017, CHG-2026-09-07-018, ERR-2026-09-07-004, ERR-2026-09-07-006, ERR-2026-09-07-007, DECISION-2026-09-07-002 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-007 | — | CHG-2026-09-07-019, ERR-2026-09-07-005 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-008 | — | CHG-2026-09-07-020, ERR-2026-09-07-006 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-009 | — | CHG-2026-09-07-021 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-010 | — | CHG-2026-09-07-022, DECISION-2026-09-07-003 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-07-011 | — | CHG-2026-09-07-023, DECISION-2026-09-06-002, DECISION-2026-09-06-003 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-08-001 | — | CHG-2026-09-08-001, CHG-2026-09-08-002, CHG-2026-09-08-003, CHG-2026-09-08-004 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-08-002 | — | CHG-2026-09-08-005 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-08-003 | — | CHG-2026-09-08-006, CHG-2026-09-08-007 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-08-004 | — | CHG-2026-09-08-008, CHG-2026-09-08-009, CHG-2026-09-08-010, CHG-2026-09-08-011, CHG-2026-09-08-012, CHG-2026-09-08-013, CHG-2026-09-08-014, CHG-2026-09-08-015, CHG-2026-09-08-016, ERR-2026-09-07-004, ERR-2026-09-07-007, ERR-2026-09-08-001, ERR-2026-09-08-002, ERR-2026-09-08-003, ERR-2026-09-08-004, DECISION-2026-09-07-002 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-08-005 | — | CHG-2026-09-08-017, CHG-2026-09-08-018, CHG-2026-09-08-019, CHG-2026-09-08-020, CHG-2026-09-08-021, CHG-2026-09-08-022, CHG-2026-09-08-023, CHG-2026-09-08-024, CHG-2026-09-08-025, ERR-2026-09-08-005, ERR-2026-09-08-006, ERR-2026-09-08-007, ERR-2026-09-08-008, ERR-2026-09-08-009, ERR-2026-09-08-010, ERR-2026-09-08-011, ERR-2026-09-08-012 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-09-001 | — | CHG-2026-09-09-001, CHG-2026-09-09-002, ERR-2026-09-09-001, ERR-2026-09-09-002, ERR-2026-09-09-003 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-09-002 | — | DECISION-2026-09-09-001, CHG-2026-09-09-003 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-001 | — | CHG-2026-09-10-001, DECISION-2026-09-10-001, ERR-2026-09-10-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-002 | — | CHG-2026-09-10-002, ERR-2026-09-10-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-003 | — | CHG-2026-09-10-003, CHG-2026-09-10-004, ERR-2026-09-10-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-004 | — | — (no CHG/ERR/DECISION; investigation + drive cleanup only) | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-005 | — | — (no CHG/ERR/DECISION; investigation only, no changes) | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-006 | — | CHG-2026-09-10-005 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-10-007 | — | — (no CHG/ERR/DECISION; audit found nothing to fix) | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-11-001 | — | CHG-2026-09-11-001, CHG-2026-09-11-002 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
+| RUN-2026-09-11-002 | — | CHG-2026-09-11-003, CHG-2026-09-11-004, ERR-2026-09-11-001, DECISION-2026-09-11-001 | lost — D: wipe before RUN-2026-09-12-001, see header note | — |
 | RUN-2026-09-12-001 | LEDGER-INDEX-INCIDENT-CLEANUP_2026-09-12.md | CHG-2026-09-12-001 | in-bundle | a804cc880159baea0f359921b510645b106690d8835f8d2ba6c46169d59126f9 |
 | RUN-2026-09-12-002 | ARCHITECTURE_PLACEMENT_AND_HANDOFF_FIX_2026-09-12.md | CHG-2026-09-12-002, CHG-2026-09-12-003 | in-bundle | 1322d90b3ecd48059b22a40de9f8728eff05181710fbc372bb4f909977c922cb |
 | RUN-2026-09-12-003 | CRON_GATEWAY_VERIFICATION_2026-09-12.md | CHG-2026-09-12-004, CHG-2026-09-12-005, ERR-2026-09-12-001, ERR-2026-09-12-002 | in-bundle | 2d32186e5e051d0775ed4b94a664f935ccce6ddbace0508ed0e615d4f56b240c |
-| RUN-2026-09-12-004 | FINAL_PUSH_VERIFICATION_2026-09-12.md | ledger-only (push + verification pass; no new CHG/ERR/DECISION) | in-bundle | c87655db20b1f2bc9219f2c292107093d181f3233acfdbae01763b0829413282 |
+| RUN-2026-09-12-004 | FINAL_PUSH_VERIFICATION_2026-09-12.md | ledger-only (push + verification pass; no new CHG/ERR/DECISION) | in-bundle | c25dc7809cdce7cb3f4cb449e046230ffc2b840b02df883b91561c41bd8ab46d |
+| RUN-2026-09-12-005 | REPORT-MANIFEST-COMPLETENESS-FIX_2026-09-12.md | CHG-2026-09-12-006 | in-bundle | a737159391a60bfef42fbfcb66bda078c2532bfe77629eaa6a571b66c1bdda72 |

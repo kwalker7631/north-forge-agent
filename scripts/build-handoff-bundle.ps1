@@ -13,6 +13,22 @@
     and its own real sha256 for cross-reference - it does not copy that report's
     bytes into the zip.
 
+    It ALSO copies -SessionReportPath itself to <DriveRoot>\<same filename> (unless
+    it's already sitting there) - see "THE MISSING-REPORT HANDOFF GAP" below - and
+    prints an explicit, hard-to-miss final reminder naming both files by their real
+    filenames.
+
+  THE MISSING-REPORT HANDOFF GAP (fixed 2026-09-12, CHG-2026-09-12 follow-up)
+    The zip deliberately never contains the current session's own report (see WHY,
+    below) - it was only ever written to logs\, a different folder from the drive
+    root where the zip lands. In practice, the owner repeatedly uploaded only the
+    zip to the primary GPT and forgot the separate standalone report sitting
+    elsewhere, meaning the actual current findings never arrived, more than once.
+    Not a one-time reminder problem - a structural one: two files that must travel
+    together lived in two different places. Fix: put them in the same place
+    (literally next to each other, at -DriveRoot) and print a reminder naming both
+    files explicitly, every run, immediately before the script exits.
+
   WHY (see logs\ledger\CHANGELOG.md CHG-2026-09-12, "handoff-bundle self-reference"
   and the owner's own follow-up task) -- a report cannot contain the real sha256 of a
   zip that contains that same report: the hash doesn't exist until the zip is sealed,
@@ -160,14 +176,40 @@ Compress-Archive -Path (Join-Path $stageDir '*') -DestinationPath $zipPath
 $zipSha = Get-Sha256Hex $zipPath
 [System.IO.File]::WriteAllText($shaPath, $zipSha, (New-Object System.Text.UTF8Encoding($false)))
 
+# --- copy the current session's own report next to the zip, not just logs\ ----
+# This is the actual fix for the missing-report handoff gap: both files now sit
+# in the same folder, so grabbing one without seeing the other takes an extra,
+# deliberate step instead of being the easy default.
+$reportDestPath = Join-Path $DriveRoot $sessionReportName
+$reportCopied = $false
+if ($reportDestPath -ieq $SessionReportPath) {
+    # Already sitting at -DriveRoot (e.g. the report was written there directly) -
+    # nothing to copy, not an error.
+} else {
+    Copy-Item -LiteralPath $SessionReportPath -Destination $reportDestPath -Force
+    $reportCopied = $true
+}
+
 foreach ($w in $warnings) { Write-Warning $w }
 Write-Host ""
 Write-Host "Built $zipPath" -ForegroundColor Green
 Write-Host "  sha256: $zipSha"
 Write-Host "  contains: $($includedNames.Count) item(s) from -Sources + HANDOFF-INDEX.md"
 Write-Host "  does NOT contain: $sessionReportName (the current session's own report - delivered standalone)"
+if ($reportCopied) {
+    Write-Host "  report copied alongside it: $reportDestPath"
+} else {
+    Write-Host "  report already alongside it: $reportDestPath"
+}
 Write-Host ""
 Write-Host "Fill this line into the standalone report's closing line:" -ForegroundColor Cyan
 Write-Host "  Handoff bundle: HANDOFF_$stampTag.zip (sha256: $zipSha) - created."
+Write-Host ""
+Write-Host "================================================================" -ForegroundColor Yellow
+Write-Host "IMPORTANT: attach BOTH files when sending to the primary GPT:" -ForegroundColor Yellow
+Write-Host "  1. $(Split-Path -Leaf $zipPath)" -ForegroundColor Yellow
+Write-Host "  2. $sessionReportName  <-- the actual findings are in this one" -ForegroundColor Yellow
+Write-Host "  Both are now sitting together in: $DriveRoot" -ForegroundColor Yellow
+Write-Host "================================================================" -ForegroundColor Yellow
 
 exit 0

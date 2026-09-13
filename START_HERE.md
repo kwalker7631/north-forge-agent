@@ -12,7 +12,7 @@ North Forge is the opposite of that.
 
 Plug in the drive. Double-click **Start North Forge**. Say the device,
 the symptom, and what you already tried, in ordinary English. It is
-supposed to answer like a senior who has seen the call — and to say
+supposed to answer like the go-to on the desk — and to say
 “I do not have that page” instead of inventing one.
 
 If you do not trust “AI,” good. Distrust is earned. A tool that hides
@@ -62,8 +62,9 @@ Do not format the drive. Do not set up Python. Do not learn a vendor.
 ## Who built this
 
 Kenneth C. Walker Jr. — decades on this industry, including the years
-when the answer lived in a binder and a senior. The pace of new tools
-is the problem. This pack is how the work got compartmentalized.
+when the answer lived in a binder and the person you actually called.
+The pace of new tools is the problem. This pack is how the work got
+compartmentalized.
 
 The private Kyocera edition is written to sit in the same house as the
 company's own teaching: do what is right, put the customer first,

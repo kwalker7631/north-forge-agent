@@ -14,7 +14,7 @@ does not know.**
 - Give the next exact step when a procedure exists.
 - Stop and name the gap when it does not. Ask for the page. Keep the
   answer once a human supplies it.
-- Speak like a senior, not a product blog. No essay when you asked for
+- Speak like the desk, not a product blog. No essay when you asked for
   a code.
 
 Windows, macOS, and Linux hosts are in scope for the **device's world**.
@@ -26,7 +26,7 @@ The one-click teammate drive is Windows first.
 |---|---|
 | Pocket path | USB / SSD, 8 GB or larger, **Start North Forge** |
 | Honesty | Fact / sourced / inferred / unknown. No confident fiction |
-| Voice | Desk senior. Humanizer means fewer manners, more work |
+| Voice | Go-to on the desk. Humanizer means fewer manners, more work |
 | Private edition | Intake, ticket, KB draft, escalation, fault log, training |
 | Public overlays | Field-service voice, Pocket Penny, Pine Barron Farms |
 | Memory | Drive-local conversations, corrections, logs |

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>A portable senior for the service desk.</strong><br>
+  <strong>Your go-to, in your pocket.</strong><br>
   Built for people who still believe the work is worth doing well.
 </p>
 
@@ -23,7 +23,7 @@
 
 This project exists because the job is hard and the tools we were handed were not honest enough.
 
-A technician on a live call should not have to write an eight-thousand-character prompt. They should describe the device, the symptom, and what they already tried — the way they would tell a senior who has been on the floor. North Forge is that senior in a pocket: a drive you plug in, a window you start, a voice that stays with the work.
+A technician on a live call should not have to write an eight-thousand-character prompt. They should describe the device, the symptom, and what they already tried — the way they would tell the person they actually call. North Forge is that go-to on a drive: plug it in, start it, keep the voice with the work.
 
 It is not a chatbot wearing a new jacket. It is years of technical-support instinct, compartmentalized so a teammate does not have to drink the whole firehose to clear one call. When the pack knows the next step, it gives it. When it does not, it says so. That is the point. Confidence without the page is not help.
 
@@ -38,7 +38,7 @@ Maintained by **Kenneth C. Walker Jr.**, for people who still take the desk seri
 | Sit on the call with you | Device, paper path, finish, supplies, the PC, the network, PaperCut, MyQ, and the rest of the document stack the edition has been taught |
 | Speak like the desk | Short. Ordered. Look first. Do not touch yet. Grab this. Name what is still unknown |
 | Refuse to invent | Built to show a hole instead of filling it with a plausible paragraph |
-| Keep what the shop teaches | When a senior supplies the missing page, that answer is supposed to stay |
+| Keep what the shop teaches | When someone on the desk supplies the missing page, that answer is supposed to stay |
 | Live on a drive | USB or SSD. Eight gigabytes or larger. Memory travels with the stick |
 | Work for the person holding it | Plug in. Start North Forge. Talk. `/menu` if you get lost |
 | Carry an edition | Locked to one manufacturer for a teammate. Open for an administrator who must switch packs |
@@ -58,7 +58,7 @@ Full inventory and honest limits: **[CAPABILITIES.md](CAPABILITIES.md)**.
 | **This repository** | Engine, Windows launcher, portable layout, public overlays (Pocket Penny, Pine Barron Farms, field-service voice). |
 | **The private edition** | Manufacturer procedures, skills, templates, deploy console. That is the product. |
 
-> **Important.** Cloning this repository gives you the chassis, not the private knowledge pack. A cloud model needs a network and may cost money. A local model has to be installed on purpose. Neither one is a license to skip verifying a safety-critical step.
+> **Important.** Cloning this repository gives you the chassis, not the private knowledge pack. A cloud model needs a network and may charge for use. A local model has to be installed on purpose. Neither one is a license to skip verifying a safety-critical step.
 
 ## Start here
 

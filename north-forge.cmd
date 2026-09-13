@@ -114,6 +114,10 @@ if exist "%REPO%\skins\north-forge.yaml" copy /Y "%REPO%\skins\north-forge.yaml"
 REM (Re)write "<drive>:\Start North Forge.lnk" against the path the checkout is at
 REM right now, so it stays correct even if Windows re-letters the drive.
 if exist "%REPO%\scripts\make-drive-root-shortcut.ps1" powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\scripts\make-drive-root-shortcut.ps1" -RepoRoot "%REPO%" -Quiet >nul 2>&1
+REM (Re)write "<drive>:\How To Start.lnk" the same way - a standing, always-
+REM clickable entry point back to onboarding content (WELCOME.html or whichever
+REM installed edition's docs-index page), distinct from the agent launcher above.
+if exist "%REPO%\scripts\make-how-to-start-shortcut.ps1" powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\scripts\make-how-to-start-shortcut.ps1" -RepoRoot "%REPO%" -Quiet >nul 2>&1
 REM Register any cron job a trusted skill declares in its own SKILL.md frontmatter
 REM (kyocera-research, daily-brief, etc.) - closes the gap where scheduled research
 REM only got set up if someone typed `/cron add` by hand, which a Basic-tier
